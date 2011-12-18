@@ -3,44 +3,45 @@
 
 #include <vector>
 #include "Cell.H"
-#include "Vector.H"
 
-template<class T = float>
 class Grid2D {
-  std::vector< Cell<2, T> > cells; // Holds all cells.
-  Vector<2, T> maxVelocity;        // Tracks the maximum velocity in the grid.
+  const unsigned _iSize;       // The number of rows in the sim.
+  const unsigned _jSize;       // The number of columns in the sim.
+  std::vector<Cell2D> _cells;  // STL Vector of all managed cells.
 
 public:
-  // Constructor
-  Grid2D(unsigned xSize, unsigned ySize);
+  // Constructs an isntance of Grid2D of size iSize by jSize. Currently
+  // each cell is 1.0f units by 1.0f units in size.
+  //
+  // Arguments:
+  //   unsigned iSize - The number of rows of cells in the simulation.
+  //   unsigned jSize - The number of columns of cells in the simulation.
+  Grid2D(unsigned iSize, unsigned jSize);
 
-  // Get the interpolated velocity at the real location (x,y).
-  Vector<2, T> getVelocity(float x, float y) const;
+  // Returns a reference to the specified cell.
+  // 
+  // Arguments:
+  //   unsigned i - The i index (row) of the cell.
+  //   unsigned j - The j index (column) of the cell.
+  //
+  // Returns:
+  //   Cell2D& - A reference to the specified cell.
+  inline Cell2D& operator()(unsigned i, unsigned j);
   
-  // Get the pressure gradient at the cell (x,y).
-  Vector<2, T> getPressureGradient(unsigned x, unsigned y) const;
-  
-protected:
-  // Return a reference to the specified Cell.
-  inline Cell<2, T>& operator()(unsigned x, unsigned y);
-
-  // Return the 'index' component of velocity at the real location (x,y).
-  Vector<2, T> getInterpolatedValue(float x, float y, unsigned index) const;
+  // Returns a copy of the specified cell.
+  // 
+  // Arguments:
+  //   unsigned i - The i index (row) of the cell.
+  //   unsigned j - The j index (column) of the cell.
+  //
+  // Returns:
+  //   Cell2D - A copy of the specified cell.
+  inline Cell2D operator()(unsigned i, unsigned j) const;
 
 private:
   // Hidden default constructor
   Grid2D();
 };
-
-
-template<class T>
-Grid2D<T>::Grid2D(unsigned xSize, unsigned ySize)
-{
-  cells.resize(xSize * ySize);
-}
-
-
-// TODO define more methods here.
 
 
 #endif //__GRID_H__

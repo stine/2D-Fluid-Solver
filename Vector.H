@@ -3,7 +3,7 @@
 
 template <unsigned N, class T = float>
 class Vector {
-  T val[N];
+  T _val[N];
 
 public:
   // Default Constructor
@@ -38,7 +38,7 @@ template<unsigned N, class T>
 Vector<N, T>::Vector()
 {
   for (unsigned i = 0; i < N; ++i)
-    val[i] = 0;
+    _val[i] = 0;
 }
 
 
