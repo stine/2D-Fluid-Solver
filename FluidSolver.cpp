@@ -1,4 +1,4 @@
-#include "FluidSolver.H"
+#include "FluidSolver.h"
 #include <vector>
 
 FluidSolver2D::FluidSolver2D(unsigned iSize, unsigned jSize,

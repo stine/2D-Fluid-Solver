@@ -1,4 +1,4 @@
-#include "Cell.H"
+#include "Cell.h"
 #include <cstddef>
 
 Cell2D::Cell2D()

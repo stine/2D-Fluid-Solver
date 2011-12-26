@@ -1,12 +1,14 @@
-#include "Grid.H"
+#include "Grid.h"
 #include <vector>
 
 using namespace std;
 
-Grid2D::Grid2D(unsigned xSize, unsigned ySize)
+Grid2D::Grid2D(unsigned iSize, unsigned jSize)
+  : _iSize(iSize),
+    _jSize(jSize)
 {
   // Initialize data members.
-  _cells.resize(xSize * ySize);
+  _cells.resize(_iSize * _jSize);
   // TODO maxVelocity
   
   // Create linkage between cells, since we're delegating interpolation to the

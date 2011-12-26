@@ -1,7 +1,7 @@
 #ifndef __CELL2D_H__
 #define __CELL2D_H__
 
-#include "Vector.H"
+#include "Vector.h"
 
 #define CELL2D_DIM 2
 #define CELL2D_NEIGHBOR_COUNT 4

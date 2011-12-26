@@ -2,7 +2,7 @@
 #define __GRID_H__
 
 #include <vector>
-#include "Cell.H"
+#include "Cell.h"
 
 class Grid2D {
   const unsigned _iSize;       // The number of rows in the sim.

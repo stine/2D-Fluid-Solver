@@ -1,8 +1,8 @@
 #ifndef __FLUID_SOLVER_H__
 #define __FLUID_SOLVER_H__
 
-#include "Grid.H"
-#include "Vector.H"
+#include "Grid.h"
+#include "Vector.h"
 
 class FluidSolver2D {
   const unsigned  _iSize;       // The number of rows in the sim.
