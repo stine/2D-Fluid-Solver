@@ -1,6 +1,7 @@
 *~
 *.o
 *.gch
+*.app
 2D-Fluid-Solver
 moc_*
 Makefile
