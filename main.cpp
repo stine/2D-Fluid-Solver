@@ -1,25 +1,32 @@
+#include <QtGui/QApplication>
 #include <vector>
+#include "MainWindow.h"
 #include "FluidSolver.h"
+#include "FluidRenderer2D.h"
 
 using namespace std;
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-  // 0. Set initial simulation state.
-  // 1. Calculate the simulation time step based on max velocity (CFL Condition)
-  // 2. Advance the velocity field.
-  //    2a. Apply advection using backward particle trace and RK2
-  //    2b. Apply external forces, inc gravity.
-  //    2c. Run the pressure solve through MUMPS.
-  //    2d. Apply the pressure to the simulation.
-  //    2e. Nullify "solid cell" velocities.
-  // 3. Move visible particles through the velocity field.
+  // Create the Qt application.
+  QApplication app(argc, argv);
 
+  // Load the simulation start state.
+  vector<bool> initialFluid;    // TODO load from file.
 
-  // TODO load initialFluid from file.
-  vector<bool> initialFluid;
-
-  FluidSolver2D(128, 128, initialFluid);
+  // Instantiate the Fluid Solver.
+  FluidSolver2D solver(64, 64, initialFluid);
   
-  return 0;
+  // Instantiate the OpenGL renderer.
+  FluidRenderer2D renderer(&solver);
+
+  // Create and realize UI widgets.
+  MainWindow window(&renderer);
+  window.resize(window.sizeHint());
+  window.show();
+
+  // ...timer...?
+
+  // Begin the Qt event loop.
+  return app.exec();
 }

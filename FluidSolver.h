@@ -4,11 +4,15 @@
 #include "Grid.h"
 #include "Vector.h"
 
-class FluidSolver2D {
+class FluidRenderer2D;
+
+class FluidSolver2D
+{
   const unsigned  _iSize;       // The number of rows in the sim.
   const unsigned  _jSize;       // The number of columns in the sim.
   Grid2D          _grid;        // The 2D MAC Grid.
   Vector<2,float> _maxVelocity; // The maximum velocity seen last timestep.
+  // TODO vector<MarkerParticle>
 
 public:
   // Constructs a 2D fluid simulation of the specified size.  Currently
@@ -18,8 +22,10 @@ public:
   //   unsigned iSize - The number of rows of cells in the simulation.
   //   unsigned jSize - The number of columns of cells in the simulation.
   //   vector<bool> initialFluid - Array of flags representing initial state.
-  FluidSolver2D(unsigned iSize, unsigned jSize,
-		const std::vector<bool> &initialFluid);
+  FluidSolver2D
+    (unsigned iSize,
+     unsigned jSize,
+     const std::vector<bool> &initialFluid);
 
   // Advances the simulation by an appropriately-sized timestep. The timestep
   // is calculated based on the maximum velocity seen in the simulation at the
@@ -30,6 +36,14 @@ public:
   // Returns:
   //   float - The number of seconds simulated.
   float advanceSimulation();
+
+  // Draws the current state of the simulation using the provided FluidRenderer.
+  // 
+  // Arguments:
+  //   FluidRenderer2D *renderer - The FluidRenderer2D to draw all sim data.
+  // Returns:
+  //   None
+  void draw(FluidRenderer2D *renderer) const;
 
 protected:
   // Advects the fluid's velocity field via a backward particle trace.

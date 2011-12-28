@@ -1,4 +1,6 @@
 *~
 *.o
 *.gch
-2Dsolver
+2D-Fluid-Solver
+moc_*
+Makefile

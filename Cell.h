@@ -3,20 +3,20 @@
 
 #include "Vector.h"
 
-#define CELL2D_DIM 2
-#define CELL2D_NEIGHBOR_COUNT 4
+#define C2D_DIM 2
+#define C2D_NEI 2
 
 // Note that a Vector<> is not used to represent velocity inside a cell. This
 //   is because in a MAC (Marker-and-Cell) Grid, each velocity component is
 //   stored normal to a different face on the containing cell.
 
 class Cell2D {
-  float _pressure;          // Pressure, as sampled at the center of this cell.
-  float _velocity[2];       // Velocity component, as sampled at the faces.
-  float _stagedVelocity[2]; // Temp vel. component, as sampled at the faces.
-  bool  _isLiquid;          // Flag, true if the cell contains liquid.
-  bool  _hasAllNeighbors;   // Flag, true if all four neighbors are in grid.
-  Cell2D *_neighbor[4];     // Pointers to neighbor cell, order: -X, +X, -Y, +Y.
+  float _pressure;           // Pressure, as sampled at the center of this cell.
+  float _velocity[C2D_DIM];  // Velocity component, as sampled at the faces.
+  float _stagedVelocity[C2D_DIM]; // Temp vel. component, as sampled at faces.
+  bool  _isLiquid;           // Flag, true if the cell contains liquid.
+  bool  _hasAllNeighbors;    // Flag, true if all four neighbors are in grid.
+  Cell2D *_neighbor[C2D_NEI];// Pointers to neighbor cell, order: -X, +X, -Y, +Y
 
 public:
   // Default Constructor

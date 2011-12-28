@@ -13,10 +13,4 @@ Grid2D::Grid2D(unsigned iSize, unsigned jSize)
   
   // Create linkage between cells, since we're delegating interpolation to the
   // cell objects themselves.
-  // TODO
 }
-
-
-// TODO define more methods here.
-
-

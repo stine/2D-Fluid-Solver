@@ -7,13 +7,11 @@ Cell2D::Cell2D()
     _hasAllNeighbors(false)
 {
   // Initialize array data members.
-  for (unsigned i = 0; i < CELL2D_DIM; ++i) {
+  for (unsigned i = 0; i < C2D_DIM; ++i) {
     _velocity[i] = 0.0f;
     _stagedVelocity[i] = 0.0f;
   }
-  for (unsigned i = 0; i < CELL2D_NEIGHBOR_COUNT; ++i) {
+  for (unsigned i = 0; i < C2D_NEI; ++i) {
     _neighbor[i] = NULL;
   }
 }
-
-// TODO define methods here.

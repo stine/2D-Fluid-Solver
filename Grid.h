@@ -38,10 +38,50 @@ public:
   //   Cell2D - A copy of the specified cell.
   inline Cell2D operator()(unsigned i, unsigned j) const;
 
+  // Gets the number of rows in the grid.
+  //
+  // Arguments:
+  //   None
+  // Returns:
+  //   unsigned - The number of rows in the grid.
+  inline unsigned getRowCount();
+
+  // Gets the number of cols in the grid.
+  //
+  // Arguments:
+  //   None
+  // Returns:
+  //   unsigned - The number of cols in the grid.
+  inline unsigned getColCount();
+
 private:
   // Hidden default constructor
   Grid2D();
 };
 
 
+Cell2D& Grid2D::operator()(unsigned i, unsigned j)
+{
+  std::size_t index = i * _jSize + j;
+  return _cells[index];
+}
+ 
+ 
+Cell2D Grid2D::operator()(unsigned i, unsigned j) const
+{
+  std::size_t index = i * _jSize + j;
+  return _cells[index];
+}
+
+
+unsigned Grid2D::getRowCount()
+{
+  return _iSize;
+}
+
+
+unsigned Grid2D::getColCount()
+{
+  return _jSize;
+}
 #endif //__GRID_H__

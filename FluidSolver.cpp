@@ -1,4 +1,5 @@
 #include "FluidSolver.h"
+#include "FluidRenderer2D.h"
 #include <vector>
 
 FluidSolver2D::FluidSolver2D(unsigned iSize, unsigned jSize,
@@ -12,3 +13,10 @@ FluidSolver2D::FluidSolver2D(unsigned iSize, unsigned jSize,
   // TODO setup initial fluid state.
 }
     
+
+void FluidSolver2D::draw(FluidRenderer2D *renderer) const
+{
+  // Pass a reference to our private grid into the specified renderer.
+  renderer->drawGrid2D(_grid);
+}
+
