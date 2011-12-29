@@ -41,8 +41,4 @@ Vector<N, T>::Vector()
     _val[i] = 0;
 }
 
-
-// TODO define methods as needed.
-
-
 #endif //__VECTOR_H__

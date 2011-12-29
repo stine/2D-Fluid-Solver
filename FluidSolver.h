@@ -8,8 +8,8 @@ class FluidRenderer2D;
 
 class FluidSolver2D
 {
-  const unsigned  _iSize;       // The number of rows in the sim.
-  const unsigned  _jSize;       // The number of columns in the sim.
+  const unsigned  _rowCount;    // The number of rows in the sim.
+  const unsigned  _colCount;    // The number of columns in the sim.
   Grid2D          _grid;        // The 2D MAC Grid.
   Vector<2,float> _maxVelocity; // The maximum velocity seen last timestep.
   // TODO vector<MarkerParticle>
@@ -19,12 +19,12 @@ public:
   // each cell is 1.0f units by 1.0f units in size.
   //
   // Arguments:
-  //   unsigned iSize - The number of rows of cells in the simulation.
-  //   unsigned jSize - The number of columns of cells in the simulation.
+  //   unsigned rowCount - The number of rows of cells in the simulation.
+  //   unsigned colCount - The number of columns of cells in the simulation.
   //   vector<bool> initialFluid - Array of flags representing initial state.
   FluidSolver2D
-    (unsigned iSize,
-     unsigned jSize,
+    (unsigned rowCount,
+     unsigned colCount,
      const std::vector<bool> &initialFluid);
 
   // Advances the simulation by an appropriately-sized timestep. The timestep

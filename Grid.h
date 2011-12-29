@@ -5,38 +5,44 @@
 #include "Cell.h"
 
 class Grid2D {
-  const unsigned _iSize;       // The number of rows in the sim.
-  const unsigned _jSize;       // The number of columns in the sim.
+  const unsigned _rowCount;    // The number of rows in the sim.
+  const unsigned _colCount;    // The number of columns in the sim.
   std::vector<Cell2D> _cells;  // STL Vector of all managed cells.
 
 public:
-  // Constructs an isntance of Grid2D of size iSize by jSize. Currently
+  // Constructs an instance of Grid2D of size rowCount by colCount. Currently
   // each cell is 1.0f units by 1.0f units in size.
   //
   // Arguments:
-  //   unsigned iSize - The number of rows of cells in the simulation.
-  //   unsigned jSize - The number of columns of cells in the simulation.
-  Grid2D(unsigned iSize, unsigned jSize);
+  //   unsigned rowCount - The number of rows of cells in the simulation. 
+  //   unsigned colCount - The number of columns of cells in the simulation.
+  Grid2D(unsigned rowCount, unsigned colCount);
+
+  // Destructs an instance of Grid2D.
+  //
+  // Arguments:
+  //   None
+  ~Grid2D();
 
   // Returns a reference to the specified cell.
   // 
   // Arguments:
-  //   unsigned i - The i index (row) of the cell.
-  //   unsigned j - The j index (column) of the cell.
+  //   unsigned row - The row index of the cell.
+  //   unsigned col - The column index of the cell.
   //
   // Returns:
   //   Cell2D& - A reference to the specified cell.
-  inline Cell2D& operator()(unsigned i, unsigned j);
+  inline Cell2D& operator()(unsigned row, unsigned col);
   
   // Returns a copy of the specified cell.
   // 
   // Arguments:
-  //   unsigned i - The i index (row) of the cell.
-  //   unsigned j - The j index (column) of the cell.
+  //   unsigned row - The row index of the cell.
+  //   unsigned col - The column index of the cell.
   //
   // Returns:
   //   Cell2D - A copy of the specified cell.
-  inline Cell2D operator()(unsigned i, unsigned j) const;
+  inline Cell2D operator()(unsigned row, unsigned col) const;
 
   // Gets the number of rows in the grid.
   //
@@ -60,28 +66,29 @@ private:
 };
 
 
-Cell2D& Grid2D::operator()(unsigned i, unsigned j)
+Cell2D& Grid2D::operator()(unsigned row, unsigned col)
 {
-  std::size_t index = i * _jSize + j;
+  unsigned index = row * _colCount + col;
   return _cells[index];
 }
  
  
-Cell2D Grid2D::operator()(unsigned i, unsigned j) const
+Cell2D Grid2D::operator()(unsigned row, unsigned col) const
 {
-  std::size_t index = i * _jSize + j;
+  unsigned index = row * _colCount + col;
   return _cells[index];
 }
 
 
 unsigned Grid2D::getRowCount()
 {
-  return _iSize;
+  return _rowCount;
 }
 
 
 unsigned Grid2D::getColCount()
 {
-  return _jSize;
+  return _colCount;
 }
+
 #endif //__GRID_H__

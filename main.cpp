@@ -1,5 +1,6 @@
 #include <QtGui/QApplication>
 #include <vector>
+#include <algorithm>
 #include "MainWindow.h"
 #include "FluidSolver.h"
 #include "FluidRenderer2D.h"
@@ -12,10 +13,12 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
 
   // Load the simulation start state.
-  vector<bool> initialFluid;    // TODO load from file.
+  // TODO load from file, currently sets top row to "true".
+  vector<bool> initialFluid(16*16, false);
+  fill(initialFluid.end()-16, initialFluid.end(), true);
 
   // Instantiate the Fluid Solver.
-  FluidSolver2D solver(64, 64, initialFluid);
+  FluidSolver2D solver(16, 16, initialFluid);
   
   // Instantiate the OpenGL renderer.
   FluidRenderer2D renderer(&solver);

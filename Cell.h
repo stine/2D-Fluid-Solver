@@ -4,7 +4,8 @@
 #include "Vector.h"
 
 #define C2D_DIM 2
-#define C2D_NEI 2
+#define C2D_NEI 4
+
 
 // Note that a Vector<> is not used to represent velocity inside a cell. This
 //   is because in a MAC (Marker-and-Cell) Grid, each velocity component is

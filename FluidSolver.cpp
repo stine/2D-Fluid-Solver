@@ -2,15 +2,19 @@
 #include "FluidRenderer2D.h"
 #include <vector>
 
-FluidSolver2D::FluidSolver2D(unsigned iSize, unsigned jSize,
+FluidSolver2D::FluidSolver2D(unsigned rowCount, unsigned colCount,
 			     const std::vector<bool> &initialFluid)
-  : _iSize(iSize),
-    _jSize(jSize),
-    _grid(iSize, jSize)
+  : _rowCount(rowCount),
+    _colCount(colCount),
+    _grid(rowCount, colCount),
+    _maxVelocity()
 {
-  // TODO initialize _maxVelocity.
-
-  // TODO setup initial fluid state.
+  // Set initial fluid state within the 2D grid.
+  for (unsigned i = 0; i < initialFluid.size(); ++i) {
+    unsigned rowIdx = i / _colCount;
+    unsigned colIdx = i % _colCount;
+    _grid(rowIdx, colIdx).setIsLiquid(initialFluid[i]);
+  }
 }
     
 
