@@ -20,6 +20,19 @@ class Cell2D {
   Cell2D *_neighbor[C2D_NEI];// Pointers to neighbor cell, order: -X, +X, -Y, +Y
 
 public:
+  // Enumerated type used in the Cell class to enumerate Neighbors.
+  enum Neighbor {
+    TOP_LEFT = 0,
+    TOP_CENTER,
+    TOP_RIGHT,
+    LEFT,
+    RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_CENTER,
+    BOTTOM_RIGHT,
+    NEIGHBOR_COUNT
+  };
+
   // Default Constructor
   //
   // Sets up an empty grid cell.
@@ -39,17 +52,14 @@ public:
   // getVelocityDivergence() can be called.
   //
   // Arguments:
-  //   Cell2D *negXNeighbor - Pointer to the neighbor on the negative x side.
-  //   Cell2D *posXNeighbor - Pointer to the neighbor on the positive x side.
-  //   Cell2D *negYNeighbor - Pointer to the neighbor on the negative y side.
-  //   Cell2D *posYNeighbor - Pointer to the neighbor on the positive y side.
+  //   Cell2D *neighbor - An array of EIGHT pointers to neighboring cells.
+  //                    - Provided in the order of TopLeft, TopCenter, TopRt,
+  //                    - Left, Right, BottomLeft, BottomCenter, BottomRt.
+  //   unsigned length - The number of elements in the array.  Must be eight.
   //
   // Returns:
   //   None
-  void setLinkage(Cell2D *negXNeighbor,
-		  Cell2D *posXNeighbor,
-		  Cell2D *negYNeighbor,
-		  Cell2D *posYNeighbor);
+  void setLinkage(Cell2D *neighbor[], unsigned length);
 
   // Tears down linkage from this cell to its neighboring cells.
   //

@@ -16,27 +16,46 @@ Grid2D::Grid2D(unsigned rowCount, unsigned colCount)
   // interpolation to the cell objects themselves.
   unsigned size = _rowCount * _colCount;
   for (unsigned i = 0; i < size; ++i) {
-    Cell2D *negX = NULL;
-    if (i % _colCount != 0) {
-      negX = &(_cells[i - 1]);
-    }
-    
-    Cell2D *posX = NULL;
-    if (i % _colCount != _colCount - 1) {
-      posX = &(_cells[i + 1]);
-    }
+    Cell2D *neighbors[Cell2D::NEIGHBOR_COUNT];
 
-    Cell2D *negY = NULL;
-    if (i / _colCount != 0) {
-      negY = &(_cells[i - _colCount]);
-    }
+    // Top Left Neighborx
+    // TODO
+    neighbors[Cell2D::TOP_LEFT] = NULL;
 
-    Cell2D *posY = NULL;
+    // Top Neighbor
     if (i / _colCount != _rowCount - 1) {
-      posY = &(_cells[i + _colCount]);
+      neighbors[Cell2D::TOP_CENTER] = &(_cells[i + _colCount]);
+    }
+
+    // Top Right Cell
+    // TODO
+    neighbors[Cell2D::TOP_RIGHT] = NULL;
+    
+    // Left Neighbor
+    if (i % _colCount != 0) {
+      neighbors[Cell2D::LEFT] = &(_cells[i - 1]);
+    }
+
+    // Right Neighbor
+    if (i % _colCount != _colCount - 1) {
+      neighbors[Cell2D::RIGHT] = &(_cells[i + 1]);
     }
     
-    _cells[i].setLinkage(negX, posX, negY, posY);
+    // Bottom Left Neighbor
+    // TODO
+    neighbors[Cell2D::BOTTOM_LEFT] = NULL;
+
+    // Bottom Neighbor
+    if (i / _colCount != 0) {
+      neighbors[Cell2D::BOTTOM_CENTER] = &(_cells[i - _colCount]);
+    }
+
+    // Bottom Right Neighbor
+    // TODO
+    neighbors[Cell2D::BOTTOM_RIGHT] = NULL;
+
+    // Set the cell linkage.
+    _cells[i].setLinkage(neighbors, Cell2D::NEIGHBOR_COUNT);
   }
 }
 

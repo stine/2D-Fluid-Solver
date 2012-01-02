@@ -1,5 +1,6 @@
 #include "Cell.h"
 #include <cstddef>
+#include <cstring>
 
 Cell2D::Cell2D()
   : _pressure(0.0f),
@@ -17,16 +18,13 @@ Cell2D::Cell2D()
 }
 
 
-void Cell2D::setLinkage(Cell2D *negXNeighbor,
-			Cell2D *posXNeighbor,
-			Cell2D *negYNeighbor,
-			Cell2D *posYNeighbor)
+void Cell2D::setLinkage(Cell2D *neighbor[], unsigned length)
 {
-  // Set all neighbor pointers.
-  _neighbor[0] = negXNeighbor;
-  _neighbor[1] = posXNeighbor;
-  _neighbor[2] = negYNeighbor;
-  _neighbor[3] = posYNeighbor;  
+  // Assert (length == NEIGHBOR_COUNT).
+  // TODO
+
+  // Copy pointers locally.
+  memcpy(neighbor, _neighbor, NEIGHBOR_COUNT * sizeof(Cell2D*));
 
   // Set neighbor flag.
   _hasAllNeighbors = true;
