@@ -24,7 +24,7 @@ public:
   //   None
   ~Grid2D();
 
-  // Returns a reference to the specified cell.
+  // Returns a reference to the specified cell, as specified by row and column.
   // 
   // Arguments:
   //   unsigned row - The row index of the cell.
@@ -34,7 +34,7 @@ public:
   //   Cell2D& - A reference to the specified cell.
   inline Cell2D& operator()(unsigned row, unsigned col);
   
-  // Returns a copy of the specified cell.
+  // Returns a copy of the specified cell, as specified by row and column.
   // 
   // Arguments:
   //   unsigned row - The row index of the cell.
@@ -43,6 +43,24 @@ public:
   // Returns:
   //   Cell2D - A copy of the specified cell.
   inline Cell2D operator()(unsigned row, unsigned col) const;
+
+  // Returns a reference to the specified cell, as specified by index.
+  // 
+  // Arguments:
+  //   unsigned index - The index of the cell.
+  //
+  // Returns:
+  //   Cell2D& - A reference to the specified cell.
+  inline Cell2D& operator[](unsigned index);
+
+  // Returns a copy of the specified cell, as specified by index.
+  // 
+  // Arguments:
+  //   unsigned index - The index of the cell.
+  //
+  // Returns:
+  //   Cell2D - A copy of the specified cell.
+  inline Cell2D operator[](unsigned index) const;
 
   // Gets the number of rows in the grid.
   //
@@ -72,6 +90,18 @@ Cell2D& Grid2D::operator()(unsigned row, unsigned col)
 Cell2D Grid2D::operator()(unsigned row, unsigned col) const
 {
   unsigned index = row * _colCount + col;
+  return _cells[index];
+}
+
+
+Cell2D& Grid2D::operator[](unsigned index)
+{
+  return _cells[index];
+}
+
+
+Cell2D Grid2D::operator[](unsigned index) const
+{
   return _cells[index];
 }
 
