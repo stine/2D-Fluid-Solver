@@ -1,5 +1,5 @@
 #include "FluidSolver.h"
-#include "FluidRenderer2D.h"
+#include "FluidRenderer.h"
 #include <vector>
 
 FluidSolver2D::FluidSolver2D(unsigned rowCount, unsigned colCount,
@@ -18,9 +18,20 @@ FluidSolver2D::FluidSolver2D(unsigned rowCount, unsigned colCount,
 }
     
 
-void FluidSolver2D::draw(FluidRenderer2D *renderer) const
+void FluidSolver2D::draw(FluidRenderer *renderer) const
 {
   // Pass a reference to our private grid into the specified renderer.
   renderer->drawGrid2D(_grid);
 }
 
+
+unsigned FluidSolver2D::getSimulationWidth() const
+{
+  return _colCount;
+}
+  
+
+unsigned FluidSolver2D::getSimulationHeight() const
+{
+  return _rowCount;
+}

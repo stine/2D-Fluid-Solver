@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "MainWindow.h"
 #include "FluidSolver.h"
-#include "FluidRenderer2D.h"
+#include "CompatibilityRenderer.h"
 
 using namespace std;
 
@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
 
   // Load the simulation start state.
-  // TODO load from file, currently sets top row to "true".
   vector<bool> initialFluid(16*16, false);
   fill(initialFluid.end()-16, initialFluid.end(), true);
 
@@ -21,7 +20,7 @@ int main(int argc, char *argv[])
   FluidSolver2D solver(16, 16, initialFluid);
   
   // Instantiate the OpenGL renderer.
-  FluidRenderer2D renderer(&solver);
+  CompatibilityRenderer renderer(solver);
 
   // Create and realize UI widgets.
   MainWindow window(&renderer);

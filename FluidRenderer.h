@@ -2,6 +2,7 @@
 #define __FLUID_RENDERER_H__
 
 #include <QGLWidget>
+#include "Grid.h"
 
 class FluidRenderer : public QGLWidget
 {
@@ -45,6 +46,17 @@ public:
   // Returns:
   //   QSize - The recommended size for this widget.
   virtual QSize sizeHint() const;
+
+  // Renders the fluid simulation grid, the contents of each cell
+  // (liquid, solid, or gas), and velocity vectors at the center of each
+  // cell.
+  //
+  // Arguments:
+  //   Grid2D &grid - The grid object containing all simulation cell data.
+  //
+  // Returns:
+  //   None
+  virtual void drawGrid2D(const Grid2D &grid) = 0;
 
 protected:
   // Performs all initial OpenGL commands, including modelview and projection

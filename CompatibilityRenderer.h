@@ -1,31 +1,32 @@
-#ifndef __FLUID_RENDERER_2D_H__
-#define __FLUID_RENDERER_2D_H__
+#ifndef __COMPATIBILITY_RENDERER_H__
+#define __COMPATIBILITY_RENDERER_H__
 
 #include <QGLWidget>
 #include "FluidRenderer.h"
 #include "FluidSolver.h"
 #include "Grid.h"
 
-class FluidRenderer2D : public FluidRenderer
+class CompatibilityRenderer : public FluidRenderer
 {
-  const FluidSolver2D *_solver;
+  const FluidSolver2D &_solver;
 
 public:
-  // Constructs a renderer that specifically handles 2D fluid simulations.
+  // Constructs a renderer that specifically handles 2D fluid simulations,
+  // and performs all rendering using immediate-mode OpenGL commands.
   // This class serves as a self-contained Qt widget and OpenGL context
   // wrapper.
   //
   // Arguments:
-  //   FluidSolver2D *solver - Pointer to a fluid solver object.
+  //   FluidSolver2D &solver - Const reference to a fluid solver object.
   //   QWidget *parent - Optional pointer to this widget's parent.
-  FluidRenderer2D(const FluidSolver2D *solver,
-		  QWidget *parent = NULL);
+  CompatibilityRenderer(const FluidSolver2D &solver,
+			QWidget *parent = NULL);
 
   // Destructor
   //
   // Arguments:
   //   None
-  virtual ~FluidRenderer2D();
+  virtual ~CompatibilityRenderer();
 
   // Renders the fluid simulation grid, the contents of each cell
   // (liquid, solid, or gas), and velocity vectors at the center of each
@@ -88,4 +89,4 @@ protected:
   virtual void paintGL();
 };
 
-#endif // __FLUID_RENDERER_2D_H__
+#endif // __COMPATIBILITY_RENDERER_H__

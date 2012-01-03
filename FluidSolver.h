@@ -3,8 +3,8 @@
 
 #include "Grid.h"
 #include "Vector.h"
+#include "FluidRenderer.h"
 
-class FluidRenderer2D;
 
 class FluidSolver2D
 {
@@ -33,6 +33,7 @@ public:
   //
   // Arguments:
   //   None
+  //
   // Returns:
   //   float - The number of seconds simulated.
   float advanceSimulation();
@@ -40,16 +41,36 @@ public:
   // Draws the current state of the simulation using the provided FluidRenderer.
   // 
   // Arguments:
-  //   FluidRenderer2D *renderer - The FluidRenderer2D to draw all sim data.
+  //   FluidRenderer *renderer - The FluidRenderer to draw all sim data.
+  //
   // Returns:
   //   None
-  void draw(FluidRenderer2D *renderer) const;
+  void draw(FluidRenderer *renderer) const;
+  
+  // Returns the simulation width.
+  //
+  // Arguments:
+  //   None
+  // 
+  // Returns:
+  //   unsigned - The width of the simulation.
+  unsigned getSimulationWidth() const;
+  
+  // Returns the simulation height.
+  //
+  // Arguments:
+  //   None
+  // 
+  // Returns:
+  //   unsigned - The height of the simulation.
+  unsigned getSimulationHeight() const;
 
 protected:
   // Advects the fluid's velocity field via a backward particle trace.
   //
   // Arguments:
   //   None
+  //
   // Returns:
   //   None
   void advectVelocity();
@@ -59,6 +80,7 @@ protected:
   //
   // Arguments:
   //   Vector<2,float> force - The global force to apply to all fluid cells.
+  // 
   // Returns:
   //   None
   void applyGlobalForce(Vector<2,float> force);
@@ -69,6 +91,7 @@ protected:
   //
   // Arguments:
   //   None
+  // 
   // Returns:
   //   None
   void pressureSolve();
@@ -78,8 +101,10 @@ protected:
   //
   // TODO:
   //   Does this cover the case where fluid cells travel into air?
+  //
   // Arguments:
   //   None
+  //
   // Returns:
   //   None
   void boundaryCollide();

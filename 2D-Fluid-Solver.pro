@@ -16,7 +16,7 @@ SOURCES += main.cpp \
            FluidSolver.cpp \
            Grid.cpp \
            FluidRenderer.cpp \
-           FluidRenderer2D.cpp
+           CompatibilityRenderer.cpp
 
 HEADERS  += MainWindow.h \
             Vector.h \
@@ -24,4 +24,4 @@ HEADERS  += MainWindow.h \
             FluidSolver.h \
             Grid.h \
             FluidRenderer.h \
-            FluidRenderer2D.h
+            CompatibilityRenderer.h

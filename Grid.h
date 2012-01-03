@@ -50,7 +50,7 @@ public:
   //   None
   // Returns:
   //   unsigned - The number of rows in the grid.
-  inline unsigned getRowCount();
+  inline unsigned getRowCount() const;
 
   // Gets the number of cols in the grid.
   //
@@ -58,11 +58,7 @@ public:
   //   None
   // Returns:
   //   unsigned - The number of cols in the grid.
-  inline unsigned getColCount();
-
-private:
-  // Hidden default constructor
-  Grid2D();
+  inline unsigned getColCount() const;
 };
 
 
@@ -80,13 +76,13 @@ Cell2D Grid2D::operator()(unsigned row, unsigned col) const
 }
 
 
-unsigned Grid2D::getRowCount()
+unsigned Grid2D::getRowCount() const
 {
   return _rowCount;
 }
 
 
-unsigned Grid2D::getColCount()
+unsigned Grid2D::getColCount() const
 {
   return _colCount;
 }
