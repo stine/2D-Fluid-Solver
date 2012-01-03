@@ -61,7 +61,7 @@ T Vector<N,T>::operator()(const unsigned &index) const
 template<unsigned N, class T>
 T Vector<N, T>::magnitude() const
 {
-  T result;
+  T result = 0;
   for (unsigned i = 0; i < N; ++i){
     result += (*this)(i) * (*this)(i);
   }
