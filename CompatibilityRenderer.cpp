@@ -125,10 +125,10 @@ void CompatibilityRenderer::drawGrid2D(const Grid2D &grid)
   glEnd();
 
   // Color the cells blue if they currently contain liquid.
+  glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
   for (unsigned row = 0; row < grid.getRowCount(); ++row) {
     for (unsigned col = 0; col < grid.getColCount(); ++col) {
       if (grid(row, col).getIsLiquid()) {
-	glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
 	glBegin(GL_TRIANGLES);
 	glVertex2f(col, row);
 	glVertex2f(col+1, row);
