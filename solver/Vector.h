@@ -63,39 +63,31 @@ T Vector<N, T>::magnitude() const
 {
   T result = 0;
   for (unsigned i = 0; i < N; ++i){
-    result += (*this)(i) * (*this)(i);
+    result += _val[i] * _val[i];
   }
-  result = sqrt(result);
-  return result;
+  return sqrt(result);
 }
 
 template<unsigned N, class T>
 Vector<N, T>& Vector<N, T>::normalize()
 {
   T mag = (*this).magnitude();
-  for (unsigned i = 0; i < N; ++i){
-      _val[i] = _val[i] / mag;
-  }
-  return *this;
+  return *this /= mag;
 }
 
 template<unsigned N, class T>
 Vector<N, T> Vector<N, T>::unit() const
 {
-  Vector<N, T> result;
   T mag = (*this).magnitude();
-  for (unsigned i = 0; i < N; ++i){
-      result(i) = (*this)(i) / mag;
-  }
-  return result;
+  return *this / mag;
 }
 
 template<unsigned N, class T>
 T Vector<N, T>::dot(const Vector<N, T> &rhs) const
 {
-  T result;
+  T result = 0;
   for (unsigned i = 0; i < N; ++i) {
-    result += (*this)(i) * rhs(i);
+    result += _val[i] * rhs(i);
   }
   return result;
 }
@@ -106,7 +98,7 @@ Vector<N, T> Vector<N, T>::operator+(const Vector<N, T> &rhs) const
 {
   Vector<N, T> result;
   for (unsigned i = 0; i < N; ++i) {
-    result(i) = (*this)(i) + rhs(i);
+    result(i) = _val[i] + rhs(i);
   }
   return result;
 }
@@ -116,7 +108,7 @@ Vector<N, T> Vector<N, T>::operator-(const Vector<N, T> &rhs) const
 {
   Vector<N, T> result;
   for (unsigned i = 0; i < N; ++i) {
-    result(i) = (*this)(i) - rhs(i);
+    result(i) = _val[i] - rhs(i);
   }
   return result;
 }
@@ -126,7 +118,7 @@ Vector<N, T> Vector<N, T>::operator*(const T &rhs) const
 {
   Vector<N, T> result;
   for (unsigned i = 0; i < N; ++i) {
-    result(i) = (*this)(i) * rhs;
+    result(i) = _val[i] * rhs;
   }
   return result;
 }
@@ -136,7 +128,7 @@ Vector<N, T> Vector<N, T>::operator/(const T &rhs) const
 {
   Vector<N, T> result;
   for (unsigned i = 0; i < N; ++i) {
-    result(i) = (*this)(i) / rhs;
+    result(i) = _val[i] / rhs;
   }
   return result;
 }
@@ -144,37 +136,29 @@ Vector<N, T> Vector<N, T>::operator/(const T &rhs) const
 template<unsigned N, class T>
 Vector<N, T>& Vector<N, T>::operator+=(const Vector<N, T> &rhs)
 {
-  for (unsigned i = 0; i < N; ++i) { 
-    _val[i] += rhs(i);
-  }
-    return *this;
+  *this = *this + rhs; 
+  return *this;
 }
 
 template<unsigned N, class T>
 Vector<N, T>& Vector<N, T>::operator-=(const Vector<N, T> &rhs)
 {
-  for (unsigned i = 0; i < N; ++i) { 
-    _val[i] -= rhs(i);
-  }
-    return *this;
+  *this = *this - rhs;
+  return *this;
 }
 
 template<unsigned N, class T>
 Vector<N, T>& Vector<N, T>::operator*=(const T &rhs)
 {
-  for (unsigned i = 0; i < N; ++i) { 
-    _val[i] *= rhs;
-  }
-    return *this;
+  *this = *this * rhs;
+  return *this;
 }
 
 template<unsigned N, class T>
 Vector<N, T>& Vector<N, T>::operator/=(const T &rhs)
 {
-  for (unsigned i = 0; i < N; ++i) { 
-    _val[i] /= rhs;
-  }
-    return *this;
+  *this = *this / rhs;
+  return *this;
 }
 
 // Comparison operator overloading
@@ -183,8 +167,9 @@ bool Vector<N, T>::operator==(const Vector<N, T> &rhs) const
 {
   bool eql = true;
   for (unsigned i = 0; i < N; ++i) {
-    if ((*this)(i) != rhs(i)) {
+    if (_val[i] != rhs(i)) {
       eql = false;
+      break;
     }
   }
   return eql;
@@ -193,13 +178,7 @@ bool Vector<N, T>::operator==(const Vector<N, T> &rhs) const
 template<unsigned N, class T>
 bool Vector<N, T>::operator!=(const Vector<N, T> &rhs) const
 {
-  bool eql = true;
-  for (unsigned i = 0; i < N; ++i) {
-    if ((*this)(i) == rhs(i)) {
-      eql = false;
-    }
-  }
-  return eql;
+  return !(*this == rhs);
 }
 
 
