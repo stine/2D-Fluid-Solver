@@ -1,15 +1,9 @@
 #include "CompatibilityRenderer.h"
 #include <cstdio>
 
-CompatibilityRenderer::CompatibilityRenderer(const FluidSolver &solver,
-					     QWidget *parent)
-  : FluidRenderer(CompatibilityRenderer::getFormat(), parent),
-    _solver(solver)
-{}
-
-
-CompatibilityRenderer::~CompatibilityRenderer()
-{}
+// TODO - YUCK - This global variable is a temporary hack!!!
+#include "FluidSolver.h"
+extern FluidSolver *solver;
 
 
 QGLFormat CompatibilityRenderer::getFormat()
@@ -21,7 +15,7 @@ QGLFormat CompatibilityRenderer::getFormat()
 }
 
 
-void CompatibilityRenderer::initializeGL()
+void CompatibilityRenderer::initialize()
 {
   // Old-fashioned OpenGL here. Rewrite for CORE profile.
   glEnable(GL_DEPTH_TEST);
@@ -40,40 +34,39 @@ void CompatibilityRenderer::initializeGL()
 }
 
 
-void CompatibilityRenderer::resizeGL(int width, int height)
+void CompatibilityRenderer::resize(int pixWidth, int pixHeight)
 {
-  // Calculate an appropriate orthographic projection matrix to display the sim.
-  //----------------------------------------------------------------------------
-
   // Define a viewport based on widget size.
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, pixWidth, pixHeight);
 
   // For the purpose of fitting the grid within the rendering area, take into
   // account a margin of 1 cell around the grid.
-  unsigned gridWidth = _solver.getSimulationWidth() + 2;
-  unsigned gridHeight = _solver.getSimulationHeight() + 2;
+  unsigned rawWidth  = solver->getSimulationWidth();
+  unsigned rawHeight = solver->getSimulationHeight();
+  unsigned paddedWidth  = rawWidth + 2;
+  unsigned paddedHeight = rawHeight + 2;
 
   // Set default values for the projection matrix.  Directly using these values
   // will result in the grid perfectly fitting within the rendering area, but
   // the grid will be stretched according to the aspect ratio.
   float xMin = -1.0f;
-  float xMax = xMin + gridWidth;
+  float xMax = xMin + paddedWidth;
   float yMin = -1.0;
-  float yMax = yMin + gridHeight;
+  float yMax = yMin + paddedHeight;
   
   // Calculate the ratio of rendering area pixels per cell along each axis.
-  float pixPerCellW = float(width) / float(gridWidth);
-  float pixPerCellH = float(height) / float(gridHeight);
+  float pixPerCellW = float(pixWidth) / float(paddedWidth);
+  float pixPerCellH = float(pixHeight) / float(paddedHeight);
   if (pixPerCellW < pixPerCellH) {
     // Width is the dominant dimension.
-    float simHeight = float(gridWidth) * float(height) / float(width);
-    yMin = -(simHeight - _solver.getSimulationHeight()) / 2;
+    float simHeight = float(paddedWidth) * float(pixHeight) / float(pixWidth);
+    yMin = -(simHeight - rawHeight) / 2;
     yMax = yMin + simHeight;
   }
   else {
     // Height is the dominant dimension.
-    float simWidth = float(gridHeight) * float(width) / float(height);
-    xMin = -(simWidth - _solver.getSimulationWidth()) / 2;
+    float simWidth = float(paddedHeight) * float(pixWidth) / float(pixHeight);
+    xMin = -(simWidth - rawHeight) / 2;
     xMax = xMin + simWidth;
   }
   
@@ -86,8 +79,12 @@ void CompatibilityRenderer::resizeGL(int width, int height)
 }
 
 
-void CompatibilityRenderer::paintGL()
+void CompatibilityRenderer::drawGrid(const Grid &grid)
 {
+  // Get grid dimensions.
+  float height = grid.getRowCount();
+  float width  = grid.getColCount();
+
   // Clear the existing framebuffer contents.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -95,30 +92,17 @@ void CompatibilityRenderer::paintGL()
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
 
-  // Provide a self-reference to the fluid solver for rendering its data.
-  _solver.draw(this);
-
-  // Restore the previous modelview matrix.
-  glPopMatrix();
-}
-
-
-void CompatibilityRenderer::drawGrid(const Grid &grid)
-{
-  float height = grid.getRowCount();
-  float width  = grid.getColCount();
-
   // Store previous OpenGL state.
   glPushAttrib(GL_CURRENT_BIT);
 
   // Draw the vertical and horizontal grid lines.
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   glBegin(GL_LINES);
-  for (unsigned i = 0; i <= grid.getColCount(); ++i) {
+  for (unsigned i = 0; i <= width; ++i) {
     glVertex2f(i, 0);
     glVertex2f(i, height);
   }
-  for (unsigned i = 0; i <= grid.getRowCount(); ++i) {
+  for (unsigned i = 0; i <= height; ++i) {
     glVertex2f(0, i);
     glVertex2f(width, i);
   }
@@ -128,8 +112,8 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
   glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
   glPushAttrib(GL_DEPTH_BUFFER_BIT);
   glDepthMask(GL_FALSE);
-  for (unsigned y = 0; y < grid.getRowCount(); ++y) {
-    for (unsigned x = 0; x < grid.getColCount(); ++x) {
+  for (unsigned y = 0; y < height; ++y) {
+    for (unsigned x = 0; x < width; ++x) {
       if (grid(x, y).isLiquid) {
 	glBegin(GL_TRIANGLES);
 	glVertex2f(x, y);
@@ -146,8 +130,8 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
 
   // Draw the MAC velocity vectors.
   glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-  for (unsigned y = 0; y < grid.getRowCount(); ++y) {
-    for (unsigned x = 0; x < grid.getColCount(); ++x) {
+  for (unsigned y = 0; y < height; ++y) {
+    for (unsigned x = 0; x < width; ++x) {
       float xV = grid(x, y).vel[Cell::X];
       glBegin(GL_LINES);
       glVertex2f(x, y + 0.5f);
@@ -168,4 +152,6 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
   // Restore previous OpenGL state.
   glPopAttrib();
 
+  // Restore the previous modelview matrix.
+  glPopMatrix();
 }

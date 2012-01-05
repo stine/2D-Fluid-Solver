@@ -16,15 +16,16 @@ INCLUDEPATH += ./ui \
 
 SOURCES += main.cpp \
            ./ui/MainWindow.cpp \
+           ./ui/QRendererWidget.cpp \
            ./solver/FluidSolver.cpp \
            ./solver/Grid.cpp \
-           ./renderers/FluidRenderer.cpp \
            ./renderers/CompatibilityRenderer.cpp
 
 HEADERS  += ./ui/MainWindow.h \
+            ./ui/QRendererWidget.h \
             ./solver/Vector.h \
             ./solver/Cell.h \
             ./solver/FluidSolver.h \
             ./solver/Grid.h \
-            ./renderers/FluidRenderer.h \
+            ./renderers/IFluidRenderer.h \
             ./renderers/CompatibilityRenderer.h

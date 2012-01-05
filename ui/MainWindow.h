@@ -3,7 +3,7 @@
 
 #include <QtGui>
 #include <QWidget>
-#include "FluidRenderer.h"
+#include "QRendererWidget.h"
 
 namespace Ui {
   class MainWindow;
@@ -12,11 +12,11 @@ namespace Ui {
 class MainWindow : public QWidget
 {
   Q_OBJECT
-  FluidRenderer *_renderer;
-  QHBoxLayout *_mainLayout;
+  QRendererWidget *_rendWidget;
+  QHBoxLayout     *_mainLayout;
     
 public:
-  MainWindow(FluidRenderer *renderer);
+  MainWindow();
   virtual ~MainWindow();
 };
 

@@ -1,6 +1,6 @@
 #include <vector>
 #include "FluidSolver.h"
-#include "FluidRenderer.h"
+#include "IFluidRenderer.h"
 #include "Grid.h"
 #include "Cell.h"
 
@@ -21,7 +21,7 @@ FluidSolver::FluidSolver(unsigned rowCount, unsigned colCount,
 }
     
 
-void FluidSolver::draw(FluidRenderer *renderer) const
+void FluidSolver::draw(IFluidRenderer *renderer) const
 {
   // Pass a reference to our private grid into the specified renderer.
   renderer->drawGrid(_grid);

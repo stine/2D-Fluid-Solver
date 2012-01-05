@@ -3,7 +3,7 @@
 
 #include "Grid.h"
 #include "Vector.h"
-#include "FluidRenderer.h"
+#include "IFluidRenderer.h"
 
 
 class FluidSolver : public QObject
@@ -41,11 +41,11 @@ public:
   // Draws the current state of the simulation using the provided FluidRenderer.
   // 
   // Arguments:
-  //   FluidRenderer *renderer - The FluidRenderer to draw all sim data.
+  //   IFluidRenderer *renderer - The FluidRenderer to draw all sim data.
   //
   // Returns:
   //   None
-  void draw(FluidRenderer *renderer) const;
+  void draw(IFluidRenderer *renderer) const;
   
   // Returns the simulation width.
   //

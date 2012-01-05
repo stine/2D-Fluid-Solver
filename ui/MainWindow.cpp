@@ -1,15 +1,18 @@
 #include <QtGui>
 #include "MainWindow.h"
-#include "FluidRenderer.h"
+#include "QRendererWidget.h"
 
-MainWindow::MainWindow(FluidRenderer *renderer)
-  : _renderer(renderer),
+MainWindow::MainWindow()
+  : _rendWidget(NULL),
     _mainLayout(NULL)
 {
+  // Establish a default renderer to use.
+  _rendWidget = QRendererWidget::rendererWidget
+    (this, QRendererWidget::COMPATIBILITY_RENDERER);
+
   // Connect the widgets to the widget heirarchy.
   _mainLayout = new QHBoxLayout;
-  _mainLayout->addWidget(renderer);  
-  _renderer->setParent(this);
+  _mainLayout->addWidget(_rendWidget);  
   setLayout(_mainLayout);
 
   // Set window title.
@@ -19,6 +22,8 @@ MainWindow::MainWindow(FluidRenderer *renderer)
 MainWindow::~MainWindow()
 {
   // Clean up memory.
+  delete _rendWidget;
+  _rendWidget = NULL;
   delete _mainLayout;
   _mainLayout = NULL;
 }

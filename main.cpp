@@ -7,6 +7,11 @@
 
 using namespace std;
 
+
+// TODO - YUCK - This global variable is a temporary hack!!!
+FluidSolver *solver = NULL;
+
+
 int main(int argc, char *argv[])
 {
   // Create the Qt application.
@@ -17,13 +22,10 @@ int main(int argc, char *argv[])
   fill(initialFluid.end()-16, initialFluid.end(), true);
 
   // Instantiate the Fluid Solver.
-  FluidSolver solver(16, 16, initialFluid);
+  solver = new FluidSolver(16, 16, initialFluid);
   
-  // Instantiate the OpenGL renderer.
-  CompatibilityRenderer renderer(solver);
-
   // Create and realize UI widgets.
-  MainWindow window(&renderer);
+  MainWindow window;
   window.resize(window.sizeHint());
   window.show();
 

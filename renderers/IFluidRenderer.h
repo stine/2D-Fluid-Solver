@@ -1,19 +1,17 @@
-#ifndef __COMPATIBILITY_RENDERER_H__
-#define __COMPATIBILITY_RENDERER_H__
+#ifndef __I_FLUID_RENDERER_H__
+#define __I_FLUID_RENDERER_H__
 
 #include <QGLWidget>
-#include "IFluidRenderer.h"
 #include "Grid.h"
 
-
-class CompatibilityRenderer : public IFluidRenderer
+class IFluidRenderer
 {
 public:
   // Destructor
   //
   // Arguments:
   //   None
-  virtual ~CompatibilityRenderer() {}
+  virtual ~IFluidRenderer() {}
 
   // Provides the required OpenGL context arguments for this renderer.
   // 
@@ -22,26 +20,22 @@ public:
   //
   // Returns:
   //   QGLFormat - The OpenGL context format required by this renderer.
-  virtual QGLFormat getFormat();
+  virtual QGLFormat getFormat() = 0;
 
   // Performs all initial OpenGL commands, including modelview and projection
   // matrix initial setup, geometry loading, etc.  Called once before the first
   // call to resizeGL or paintGL.
-  //
-  // Inherited from QGLWidget.
   //
   // Arguments:
   //   None
   //
   // Returns:
   //   None
-  virtual void initialize();
+  virtual void initialize() = 0;
 
-  // Performs necessary logic to resize the widget.  Typically involves
-  // redefining the viewport and projection matrix.  Called whenever 
-  // the widget changes size.
-  //
-  // Inherited from QGLWidget.
+  // Performs necessary logic to resize the drawing area.  Typically involves
+  // redefining the viewport and projection matrix.  Called whenever the widget
+  // changes size.
   //
   // Arguments:
   //   int pixWidth - The new width of the widget, in pixels.
@@ -49,20 +43,16 @@ public:
   //
   // Returns:
   //   None
-  virtual void resize(int pixWidth, int pixHeight);
+  virtual void resize(int pixWidth, int pixHeight) = 0;
 
-  // Renders the fluid simulation grid, the contents of each cell
-  // (liquid, solid, or gas), and velocity vectors at the center of each
-  // cell.
-  //
-  // Should typically be called from the FluidSolver class.
+  // Renders the fluid simulation grid.
   //
   // Arguments:
   //   Grid &grid - The grid object containing all simulation cell data.
   //
   // Returns:
   //   None
-  virtual void drawGrid(const Grid &grid);
+  virtual void drawGrid(const Grid &grid) = 0;
 };
 
-#endif // __COMPATIBILITY_RENDERER_H__
+#endif // __FLUID_RENDERER_H__
