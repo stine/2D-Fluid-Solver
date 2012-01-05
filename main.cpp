@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
   fill(initialFluid.end()-16, initialFluid.end(), true);
 
   // Instantiate the Fluid Solver.
-  FluidSolver2D solver(16, 16, initialFluid);
+  FluidSolver solver(16, 16, initialFluid);
   
   // Instantiate the OpenGL renderer.
   CompatibilityRenderer renderer(solver);

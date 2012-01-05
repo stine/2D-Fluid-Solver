@@ -3,64 +3,99 @@
 
 #include <vector>
 #include "Cell.h"
+#include "Vector.h"
 
-class Grid2D {
-  const unsigned _rowCount;    // The number of rows in the sim.
-  const unsigned _colCount;    // The number of columns in the sim.
-  std::vector<Cell2D> _cells;  // STL Vector of all managed cells.
+
+class Grid {
+  const unsigned _rowCount;  // The number of rows in the sim.
+  const unsigned _colCount;  // The number of columns in the sim.
+  std::vector<Cell> _cells;  // STL Vector of all managed cells.
 
 public:
-  // Constructs an instance of Grid2D of size rowCount by colCount. Currently
-  // each cell is 1.0f units by 1.0f units in size.
+  // Constructs an instance of Grid of size rowCount by colCount. Currently
+  // each cell is hardcoded at 1.0f units by 1.0f units in size.
   //
   // Arguments:
   //   unsigned rowCount - The number of rows of cells in the simulation. 
   //   unsigned colCount - The number of columns of cells in the simulation.
-  Grid2D(unsigned rowCount, unsigned colCount);
+  Grid(unsigned rowCount, unsigned colCount);
 
-  // Destructs an instance of Grid2D.
+  // Destructs an instance of Grid.
   //
   // Arguments:
   //   None
-  ~Grid2D();
+  ~Grid();
 
-  // Returns a reference to the specified cell, as specified by row and column.
+  // Returns a reference to the specified cell, as specified by x and y coord.
   // 
   // Arguments:
-  //   unsigned row - The row index of the cell.
-  //   unsigned col - The column index of the cell.
+  //   unsigned x - The integer x coordinate of this cell within the grid.
+  //   unsigned y - The integer y coordinate of this cell within the grid.
   //
   // Returns:
-  //   Cell2D& - A reference to the specified cell.
-  inline Cell2D& operator()(unsigned row, unsigned col);
+  //   Cell& - A reference to the specified cell.
+  inline Cell& operator()(unsigned x, unsigned y);
   
-  // Returns a copy of the specified cell, as specified by row and column.
+  // Returns a copy of the specified cell, as specified by x and y coord.
   // 
   // Arguments:
-  //   unsigned row - The row index of the cell.
-  //   unsigned col - The column index of the cell.
+  //   unsigned x - The integer x coordinate of this cell within the grid.
+  //   unsigned y - The integer y coordinate of this cell within the grid.
   //
   // Returns:
-  //   Cell2D - A copy of the specified cell.
-  inline Cell2D operator()(unsigned row, unsigned col) const;
+  //   Cell - A copy of the specified cell.
+  inline Cell operator()(unsigned x, unsigned y) const;
 
-  // Returns a reference to the specified cell, as specified by index.
+  // Returns a reference to the specified cell, as specified by an index
+  // into a contiguous array of Cell objects in row-major order.
   // 
   // Arguments:
-  //   unsigned index - The index of the cell.
+  //   unsigned index - The index into the row-major
   //
   // Returns:
-  //   Cell2D& - A reference to the specified cell.
-  inline Cell2D& operator[](unsigned index);
+  //   Cell& - A reference to the specified cell.
+  inline Cell& operator[](unsigned index);
 
-  // Returns a copy of the specified cell, as specified by index.
+  // Returns a copy of the specified cell, as specified by an index
+  // into a contiguous array of Cell objects in row-major order.
   // 
   // Arguments:
-  //   unsigned index - The index of the cell.
+  //   unsigned index - The index into the row-major
   //
   // Returns:
-  //   Cell2D - A copy of the specified cell.
-  inline Cell2D operator[](unsigned index) const;
+  //   Cell - A copy of the specified cell.
+  inline Cell operator[](unsigned index) const;
+
+  // Get the velocity at a location within the grid. This performs a bilinear
+  // interpolation between values in neighboring cells per component.
+  // 
+  // Arguments:
+  //   float x - The x coordinate within this cell to sample from.
+  //   float y - The y coordinate within this cell to sample from.
+  //
+  // Returns:
+  //   Vector<2,float> - The interpolated velocity at this point.
+  Vector<2,float> getVelocity(float x, float y) const;
+
+  // Calculates the pressure gradient across this cell. 
+  // 
+  // Arguments:
+  //   unsigned x - The integer x coordinate of this cell within the grid.
+  //   unsigned y - The integer y coordinate of this cell within the grid.
+  //
+  // Returns:
+  //   Vector<2,float> - The pressure gradient across this cell.
+  Vector<2,float> getPressureGradient(unsigned x, unsigned y) const;
+
+  // Calculates the divergence of the velocity field within this cell.
+  // 
+  // Arguments:
+  //   unsigned x - The integer x coordinate of this cell within the grid.
+  //   unsigned y - The integer y coordinate of this cell within the grid.
+  //
+  // Returns:
+  //   float - The divergence of the velocity field within this cell.
+  float getVelocityDivergence(unsigned x, unsigned y) const;
 
   // Gets the number of rows in the grid.
   //
@@ -80,39 +115,39 @@ public:
 };
 
 
-Cell2D& Grid2D::operator()(unsigned row, unsigned col)
+Cell& Grid::operator()(unsigned x, unsigned y)
 {
-  unsigned index = row * _colCount + col;
+  unsigned index = y * _colCount + x;
   return _cells[index];
 }
  
  
-Cell2D Grid2D::operator()(unsigned row, unsigned col) const
+Cell Grid::operator()(unsigned x, unsigned y) const
 {
-  unsigned index = row * _colCount + col;
+  unsigned index = y * _colCount + x;
   return _cells[index];
 }
 
 
-Cell2D& Grid2D::operator[](unsigned index)
-{
-  return _cells[index];
-}
-
-
-Cell2D Grid2D::operator[](unsigned index) const
+Cell& Grid::operator[](unsigned index)
 {
   return _cells[index];
 }
 
 
-unsigned Grid2D::getRowCount() const
+Cell Grid::operator[](unsigned index) const
+{
+  return _cells[index];
+}
+
+
+unsigned Grid::getRowCount() const
 {
   return _rowCount;
 }
 
 
-unsigned Grid2D::getColCount() const
+unsigned Grid::getColCount() const
 {
   return _colCount;
 }

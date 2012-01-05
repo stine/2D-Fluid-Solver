@@ -6,11 +6,11 @@
 #include "FluidRenderer.h"
 
 
-class FluidSolver2D
+class FluidSolver : public QObject
 {
   const unsigned  _rowCount;    // The number of rows in the sim.
   const unsigned  _colCount;    // The number of columns in the sim.
-  Grid2D          _grid;        // The 2D MAC Grid.
+  Grid            _grid;        // The 2D MAC Grid.
   Vector<2,float> _maxVelocity; // The maximum velocity seen last timestep.
   // TODO vector<MarkerParticle>
 
@@ -22,7 +22,7 @@ public:
   //   unsigned rowCount - The number of rows of cells in the simulation.
   //   unsigned colCount - The number of columns of cells in the simulation.
   //   vector<bool> initialFluid - Array of flags representing initial state.
-  FluidSolver2D
+  FluidSolver
     (unsigned rowCount,
      unsigned colCount,
      const std::vector<bool> &initialFluid);
@@ -111,7 +111,7 @@ protected:
 
 private:
   // Hidden default constructor.
-  FluidSolver2D();
+  FluidSolver();
 };
 
 #endif //__FLUID_SOLVER_H__

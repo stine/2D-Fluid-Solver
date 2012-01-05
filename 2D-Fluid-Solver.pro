@@ -12,7 +12,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
            MainWindow.cpp \
-           Cell.cpp \
            FluidSolver.cpp \
            Grid.cpp \
            FluidRenderer.cpp \

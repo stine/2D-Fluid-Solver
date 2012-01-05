@@ -1,7 +1,7 @@
 #include "CompatibilityRenderer.h"
 #include <cstdio>
 
-CompatibilityRenderer::CompatibilityRenderer(const FluidSolver2D &solver,
+CompatibilityRenderer::CompatibilityRenderer(const FluidSolver &solver,
 					     QWidget *parent)
   : FluidRenderer(CompatibilityRenderer::getFormat(), parent),
     _solver(solver)
@@ -103,7 +103,7 @@ void CompatibilityRenderer::paintGL()
 }
 
 
-void CompatibilityRenderer::drawGrid2D(const Grid2D &grid)
+void CompatibilityRenderer::drawGrid(const Grid &grid)
 {
   float height = grid.getRowCount();
   float width  = grid.getColCount();
@@ -124,22 +124,46 @@ void CompatibilityRenderer::drawGrid2D(const Grid2D &grid)
   }
   glEnd();
 
-  // Color the cells blue if they currently contain liquid.
+  // Color the cells gray if they currently contain liquid.
   glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
-  for (unsigned row = 0; row < grid.getRowCount(); ++row) {
-    for (unsigned col = 0; col < grid.getColCount(); ++col) {
-      if (grid(row, col).getIsLiquid()) {
+  glPushAttrib(GL_DEPTH_BUFFER_BIT);
+  glDepthMask(GL_FALSE);
+  for (unsigned y = 0; y < grid.getRowCount(); ++y) {
+    for (unsigned x = 0; x < grid.getColCount(); ++x) {
+      if (grid(x, y).isLiquid) {
 	glBegin(GL_TRIANGLES);
-	glVertex2f(col, row);
-	glVertex2f(col+1, row);
-	glVertex2f(col+1, row+1);
-	glVertex2f(col+1, row+1);
-	glVertex2f(col, row+1);
-	glVertex2f(col, row);
+	glVertex2f(x, y);
+	glVertex2f(x+1, y);
+	glVertex2f(x+1, y+1);
+	glVertex2f(x+1, y+1);
+	glVertex2f(x, y+1);
+	glVertex2f(x, y);
 	glEnd();
       }
     }
   }
+  glPopAttrib();
+
+  // Draw the MAC velocity vectors.
+  glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+  for (unsigned y = 0; y < grid.getRowCount(); ++y) {
+    for (unsigned x = 0; x < grid.getColCount(); ++x) {
+      float xV = grid(x, y).vel[Cell::X];
+      glBegin(GL_LINES);
+      glVertex2f(x, y + 0.5f);
+      glVertex2f(x + xV, y + 0.5f);
+      glEnd();
+
+      float yV = grid(x, y).vel[Cell::Y];
+      glBegin(GL_LINES);
+      glVertex2f(x + 0.5f, y);
+      glVertex2f(x + 0.5f, y + yV);
+      glEnd();
+    }
+  }
+
+  // Draw the pressure at the center of each cell.
+  // TODO
 
   // Restore previous OpenGL state.
   glPopAttrib();

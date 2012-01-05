@@ -8,18 +8,18 @@
 
 class CompatibilityRenderer : public FluidRenderer
 {
-  const FluidSolver2D &_solver;
+  const FluidSolver &_solver;
 
 public:
-  // Constructs a renderer that specifically handles 2D fluid simulations,
+  // Constructs a renderer that specifically handles 2D fluid simulations
   // and performs all rendering using immediate-mode OpenGL commands.
   // This class serves as a self-contained Qt widget and OpenGL context
   // wrapper.
   //
   // Arguments:
-  //   FluidSolver2D &solver - Const reference to a fluid solver object.
+  //   FluidSolver &solver - Const reference to a fluid solver object.
   //   QWidget *parent - Optional pointer to this widget's parent.
-  CompatibilityRenderer(const FluidSolver2D &solver,
+  CompatibilityRenderer(const FluidSolver &solver,
 			QWidget *parent = NULL);
 
   // Destructor
@@ -33,11 +33,11 @@ public:
   // cell.
   //
   // Arguments:
-  //   Grid2D &grid - The grid object containing all simulation cell data.
+  //   Grid &grid - The grid object containing all simulation cell data.
   //
   // Returns:
   //   None
-  virtual void drawGrid2D(const Grid2D &grid);
+  virtual void drawGrid(const Grid &grid);
 
   // Provides the required OpenGL context arguments for this renderer.
   // 

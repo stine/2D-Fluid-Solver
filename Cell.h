@@ -1,186 +1,68 @@
-#ifndef __CELL2D_H__
-#define __CELL2D_H__
+#ifndef __CELL_H__
+#define __CELL_H__
 
-#include "Vector.h"
-
-#define C2D_DIM 2
-#define C2D_NEI 4
-
+#include <cstddef>
+#include <cstring>
 
 // Note that a Vector<> is not used to represent velocity inside a cell. This
 //   is because in a MAC (Marker-and-Cell) Grid, each velocity component is
 //   stored normal to a different face on the containing cell.
-
-class Cell2D {
-  float _pressure;           // Pressure, as sampled at the center of this cell.
-  float _velocity[C2D_DIM];  // Velocity component, as sampled at the faces.
-  float _stagedVelocity[C2D_DIM]; // Temp vel. component, as sampled at faces.
-  bool  _isLiquid;           // Flag, true if the cell contains liquid.
-  bool  _hasAllNeighbors;    // Flag, true if all four neighbors are in grid.
-  Cell2D *_neighbor[C2D_NEI];// Pointers to neighbor cell, order: -X, +X, -Y, +Y
-
-public:
-  // Enumerated type used in the Cell class to enumerate Neighbors.
-  enum Neighbor {
-    TOP_LEFT = 0,
-    TOP_CENTER,
-    TOP_RIGHT,
-    LEFT,
-    RIGHT,
-    BOTTOM_LEFT,
-    BOTTOM_CENTER,
-    BOTTOM_RIGHT,
+struct Cell {
+  // Enumerated type used in the Cell struct to enumerate Neighbors.
+  enum Neighbor {   
+    POS_X = 0,
+    POS_Y,
+    POS_XY,
     NEIGHBOR_COUNT
   };
+  // Enumerated type to define the dimensionality of the Cell.
+  enum Dimension {
+    X = 0,
+    Y,
+    DIM_COUNT
+  };
 
-  // Default Constructor
-  //
-  // Sets up an empty grid cell.
+
+  // Public data members.
+  float pressure;             // Pressure, as sampled at the center of this cell
+  float vel[DIM_COUNT];       // Velocity component, as sampled at the faces.
+  float stagedVel[DIM_COUNT]; // Temp vel. component, as sampled at faces.
+  bool  isLiquid;             // Flag, true if the cell contains liquid.
+  bool  allNeighbors;         // Flag, true if all four neighbors are in grid.
+  Cell *neighbors[NEIGHBOR_COUNT]; // Pointers to neighbor cells.
+
+
+  // Default Constuctor, simply initializes data members to sensible values.
   //
   // Arguments:
   //   None
-  Cell2D();
+  Cell()
+    : pressure(0.0f),
+      isLiquid(false),
+      allNeighbors(false)
+  {
+    // Initialize arrays.
+    for (unsigned i = 0; i < DIM_COUNT; ++i) {
+      vel[i] = 0.0f;
+      stagedVel[i] = 0.0f;
+    }
+    for (unsigned i = 0; i < NEIGHBOR_COUNT; ++i) {
+      neighbors[i] = NULL;
+    }
+  }
 
-  // Sets linkage from this cell to its neighboring cells.  Allows velocity
-  // to be calculated at arbitrary points within this cell by interpolating
-  // between neighbors.
-  //
-  // Note that passing a NULL pointer as an argument indicates that there is
-  // no neighbor on the specified side of the cell.
-  //
-  // This must be done before getVelocity(), getPressureGradient(), or 
-  // getVelocityDivergence() can be called.
-  //
-  // Arguments:
-  //   Cell2D *neighbor - An array of EIGHT pointers to neighboring cells.
-  //                    - Provided in the order of TopLeft, TopCenter, TopRt,
-  //                    - Left, Right, BottomLeft, BottomCenter, BottomRt.
-  //   unsigned length - The number of elements in the array.  Must be eight.
-  //
-  // Returns:
-  //   None
-  void setLinkage(Cell2D *neighbor[], unsigned length);
-
-  // Tears down linkage from this cell to its neighboring cells.
+  // Realizes the staged velocity (previously set via stageVel) as the cell's
+  // current velocity. "stagedVel"'s value isn't modified.
   //
   // Arguments:
   //   None
   // 
   // Returns:
   //   None
-  void unsetLinkage();
-
-  // Gets a flag determining whether or not this cell contains liquid.
-  //
-  // Arguments:
-  //   None
-  // 
-  // Returns:
-  //   bool - True if this cell currently contains liquid.
-  bool getIsLiquid() const;
-
-  // Get the pressure at the center of this cell.
-  // 
-  // Arguments:
-  //   None
-  //
-  // Returns:
-  //   float - The pressure at the center of this cell.
-  float getPressure() const;
-
-  // Gets the MAC Grid cell's [xy] velocity component.
-  // 
-  // Arguments:
-  //   None
-  //
-  // Returns:
-  //   float - The [xy] component of velocity at position 0.0[xy].
-  float getXVelocity() const;
-  float getYVelocity() const;
-
-  // Get the velocity at a location within this cell. This performs a bilinear
-  // interpolation between values in neighboring cells for each component.
-  // 
-  // Arguments:
-  //   float x - The x coordinate within this cell to sample from. [0.0, 1.0)
-  //   float y - The y coordinate within this cell to sample from. [0.0, 1.0)
-  //
-  // Returns:
-  //   Vector<2,float> - The interpolated velocity at this point.
-  Vector<2,float> getVelocity(float x, float y) const;
-
-  // Calculates the pressure gradient across this cell. 
-  // 
-  // Arguments:
-  //   None
-  //
-  // Returns:
-  //   Vector<2,float> - The pressure gradient across this cell.
-  Vector<2,float> getPressureGradient() const;
-
-  // Calculates the divergence of the velocity field within this cell.
-  // 
-  // Arguments:
-  //   None
-  //
-  // Returns:
-  //   float - The divergence of the velocity field within this cell.
-  float getVelocityDivergence() const;
-
-  // Sets a flag determining whether or not this cell contains liquid.
-  //
-  // Arguments:
-  //   bool isLiquid - True if this cell currently contains liquid.
-  // 
-  // Returns:
-  //   None
-  void setIsLiquid(bool isLiquid);
-
-  // Sets the pressure at the center of this cell.
-  // 
-  // Arguments:
-  //   float pressure - The pressure to set.
-  //
-  // Returns:
-  //   None
-  void setPressure(float pressure);
-
-  // Sets the staggered normal velocities for this cell to the specified
-  // values.  Note again that we don't use a Vector here - this is to be
-  // clear that each component of the velocity is sampled at a distinct
-  // location in space (Marker and Cell Grid).
-  //
-  // Arguments:
-  //   float xVelocity - The new velocity's x component at 0.0x.
-  //   float yVelocity - The new velocity's y component at 0.0y.
-  //
-  // Returns:
-  //   None
-  void setVelocity(float xVelocity, float yVelocity);
-
-  // Stages staggered normal velocities for this cell. Note again that
-  // we don't use a Vector here - this is to be clear that each component
-  // of the velocity is sampled at a distinct location in space (Marker
-  // and Cell Grid).
-  //
-  // Arguments:
-  //   float xVelocity - The staged velocity's x component at 0.0x.
-  //   float yVelocity - The staged velocity's y component at 0.0y.
-  //
-  // Returns:
-  //   None
-  void stageVelocity(float xVelocity, float yVelocity);
-  
-  // Realizes the staged velocity (previously set via stageVelocity) as
-  // the cell's current velocity. After completion, the stagedVelocity is
-  // zeroed out.
-  //
-  // Arguments:
-  //   None
-  // 
-  // Returns:
-  //   None
-  void commitStagedVelocity();
+  void commitStagedVel()
+  {
+    memcpy(vel, stagedVel, sizeof(float) * DIM_COUNT);
+  }
 };
 
 

@@ -52,11 +52,11 @@ public:
   // cell.
   //
   // Arguments:
-  //   Grid2D &grid - The grid object containing all simulation cell data.
+  //   Grid &grid - The grid object containing all simulation cell data.
   //
   // Returns:
   //   None
-  virtual void drawGrid2D(const Grid2D &grid) = 0;
+  virtual void drawGrid(const Grid &grid) = 0;
 
 protected:
   // Performs all initial OpenGL commands, including modelview and projection
