@@ -4,23 +4,27 @@
 #
 #-------------------------------------------------
 
+TARGET    = 2D-Fluid-Solver
+
 QT       += core gui opengl
+CONFIG   += warn_on
+TEMPLATE  = app
 
-TARGET = 2D-Fluid-Solver
-TEMPLATE = app
-
+INCLUDEPATH += ./ui \
+               ./solver \
+               ./renderers
 
 SOURCES += main.cpp \
-           MainWindow.cpp \
-           FluidSolver.cpp \
-           Grid.cpp \
-           FluidRenderer.cpp \
-           CompatibilityRenderer.cpp
+           ./ui/MainWindow.cpp \
+           ./solver/FluidSolver.cpp \
+           ./solver/Grid.cpp \
+           ./renderers/FluidRenderer.cpp \
+           ./renderers/CompatibilityRenderer.cpp
 
-HEADERS  += MainWindow.h \
-            Vector.h \
-            Cell.h \
-            FluidSolver.h \
-            Grid.h \
-            FluidRenderer.h \
-            CompatibilityRenderer.h
+HEADERS  += ./ui/MainWindow.h \
+            ./solver/Vector.h \
+            ./solver/Cell.h \
+            ./solver/FluidSolver.h \
+            ./solver/Grid.h \
+            ./renderers/FluidRenderer.h \
+            ./renderers/CompatibilityRenderer.h
