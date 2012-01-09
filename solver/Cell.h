@@ -36,20 +36,25 @@ struct Cell {
   //
   // Arguments:
   //   None
-  Cell()
-    : pressure(0.0f),
-      isLiquid(false),
-      allNeighbors(false)
-  {
-    // Initialize arrays.
-    for (unsigned i = 0; i < DIM_COUNT; ++i) {
-      vel[i] = 0.0f;
-      stagedVel[i] = 0.0f;
-    }
-    for (unsigned i = 0; i < NEIGHBOR_COUNT; ++i) {
-      neighbors[i] = NULL;
-    }
-  }
+  Cell();
+
+  // Copy Constuctor, duplicates a cell.
+  // Does NOT copy linkage between cells, however. This must be done from a 
+  // higher level (Grid class).
+  //
+  // Arguments:
+  //   Cell &cell - The cell to copy values from.
+  Cell(const Cell &cell);
+
+  // Assignment operator, duplicates a cell.
+  // Does NOT copy linkage between cells, however. This must be done from a 
+  // higher level (Grid class).
+  //
+  // Arguments:
+  //   Cell &cell - The cell to copy values from.
+  // Returns:
+  //   Cell & - A reference to this cell.
+  Cell& operator=(const Cell& cell);
 
   // Realizes the staged velocity (previously set via stageVel) as the cell's
   // current velocity. "stagedVel"'s value isn't modified.
@@ -59,10 +64,7 @@ struct Cell {
   // 
   // Returns:
   //   None
-  void commitStagedVel()
-  {
-    memcpy(vel, stagedVel, sizeof(float) * DIM_COUNT);
-  }
+  void commitStagedVel();
 };
 
 

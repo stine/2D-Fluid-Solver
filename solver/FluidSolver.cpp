@@ -19,6 +19,17 @@ FluidSolver::FluidSolver(unsigned rowCount, unsigned colCount,
     _grid[i].isLiquid = initialFluid[i];
   }
 }
+
+
+FluidSolver::FluidSolver(const Grid &grid)
+  : _rowCount(grid.getRowCount()),
+    _colCount(grid.getColCount()),
+    _grid(grid),
+    _maxVelocity()
+{
+  // Get the max velocity within the grid.
+  // TODO
+}
     
 
 void FluidSolver::draw(IFluidRenderer *renderer) const

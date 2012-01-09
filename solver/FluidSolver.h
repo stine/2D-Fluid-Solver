@@ -27,6 +27,13 @@ public:
      unsigned colCount,
      const std::vector<bool> &initialFluid);
 
+  // Constructs a 2D fluid simulation around the specified initial grid.  Currently
+  // each cell is 1.0f units by 1.0f units in size.
+  //
+  // Arguments:
+  //   Grid &grid - The initial velocity field to use for the fluid simulation.
+  FluidSolver(const Grid &grid);
+
   // Advances the simulation by an appropriately-sized timestep. The timestep
   // is calculated based on the maximum velocity seen in the simulation at the
   // end of the previous timestep.

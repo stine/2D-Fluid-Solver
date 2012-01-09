@@ -19,6 +19,7 @@ SOURCES += main.cpp \
            ./ui/QRendererWidget.cpp \
            ./solver/FluidSolver.cpp \
            ./solver/Grid.cpp \
+           ./solver/Cell.cpp \
            ./renderers/CompatibilityRenderer.cpp
 
 HEADERS  += ./ui/MainWindow.h \

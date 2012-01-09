@@ -7,8 +7,8 @@
 
 
 class Grid {
-  const unsigned _rowCount;  // The number of rows in the sim.
-  const unsigned _colCount;  // The number of columns in the sim.
+  unsigned _rowCount;  // The number of rows in the sim.
+  unsigned _colCount;  // The number of columns in the sim.
   std::vector<Cell> _cells;  // STL Vector of all managed cells.
 
 public:
@@ -19,6 +19,20 @@ public:
   //   unsigned rowCount - The number of rows of cells in the simulation. 
   //   unsigned colCount - The number of columns of cells in the simulation.
   Grid(unsigned rowCount, unsigned colCount);
+
+  // Copy constructs an instance of Grid.
+  //
+  // Arguments:
+  //   Grid &grid - The grid to duplicate.
+  Grid(const Grid &grid);
+
+  // Assignment operator for a grid object.
+  //
+  // Arguments:
+  //   Grid &grid - The grid to assign.
+  // Returns:
+  //   Grid & - A reference to this Grid.
+  Grid & operator=(const Grid &grid);
 
   // Destructs an instance of Grid.
   //
@@ -112,6 +126,10 @@ public:
   // Returns:
   //   unsigned - The number of cols in the grid.
   inline unsigned getColCount() const;
+
+private:
+  // Creates linkage between neighboring cells.
+  void setCellLinkage();
 };
 
 
