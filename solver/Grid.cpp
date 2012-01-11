@@ -65,6 +65,8 @@ void Grid::setCellLinkage()
       _cells[i].neighbors[Cell::POS_Y] = &(_cells[i + _colCount]);
       // Top Right Cell
       _cells[i].neighbors[Cell::POS_XY] = &(_cells[i + _colCount + 1]);
+      // All neighbors are defined
+      _cells[i].allNeighbors = true;
     }
   }
 }

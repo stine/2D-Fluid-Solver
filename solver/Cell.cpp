@@ -19,13 +19,13 @@ Cell::Cell()
 Cell::Cell(const Cell &cell)
   : pressure(cell.pressure),
     isLiquid(cell.isLiquid),
-    allNeighbors(cell.allNeighbors)
+    allNeighbors(false)
 {
   // Copy arrays.
   memcpy(vel, cell.vel, DIM_COUNT * sizeof(float));
   memcpy(stagedVel, cell.stagedVel, DIM_COUNT * sizeof(float));
 
-  // Initialize 'neighbor' vectors.
+  // Initialize 'neighbor' pointers.
   for (unsigned i = 0; i < NEIGHBOR_COUNT; ++i) {
     neighbors[i] = NULL;
   }
@@ -38,11 +38,11 @@ Cell & Cell::operator=(const Cell &cell)
     // Copy data members.
     pressure = cell.pressure;
     isLiquid = cell.isLiquid;
-    allNeighbors = cell.allNeighbors;
     memcpy(vel, cell.vel, DIM_COUNT * sizeof(float));
     memcpy(stagedVel, cell.stagedVel, DIM_COUNT * sizeof(float));
     
-    // Initialize 'neighbor' vectors.
+    // Initialize 'neighbor' pointers.
+    allNeighbors = false;
     for (unsigned i = 0; i < NEIGHBOR_COUNT; ++i) {
       neighbors[i] = NULL;
     }
