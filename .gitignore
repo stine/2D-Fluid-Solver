@@ -2,6 +2,8 @@
 *.o
 *.gch
 *.app
-2D-Fluid-Solver
 moc_*
+tmp
 Makefile
+solver-tests
+2D-Fluid-Solver
