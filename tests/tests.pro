@@ -9,4 +9,5 @@ TEMPLATE = app
 SOURCES += tests.cpp
 LIBS    += -lgtest
 TARGET   = solver-tests
+QMAKE_POST_LINK=./$$TARGET
 

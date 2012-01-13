@@ -1,9 +1,9 @@
 QT      += core gui opengl
 CONFIG  += warn_on
 
-OBJECTS_DIR = tmp
-MOC_DIR     = tmp
-UI_DIR      = tmp
+OBJECTS_DIR = ../tmp
+MOC_DIR     = ../tmp
+UI_DIR      = ../tmp
 
 INCLUDEPATH += ../ui \
                ../solver \
