@@ -5,13 +5,15 @@
 #include <cmath>
 #include "Vector.h"
 
-TEST(Vector2Test, DefaultConstructor) {
+TEST(Vector2Test, DefaultConstructor)
+{
   const Vector<2,float> defaultVec;
   EXPECT_EQ(defaultVec(0), 0.0f);
   EXPECT_EQ(defaultVec(1), 0.0f);
 }
 
-TEST(Vector2Test, ElementAssignment) {
+TEST(Vector2Test, ElementAssignment) 
+{
   Vector<2,float> vec;
   vec(0) = 5.0f;
   vec(1) = 10.0f;
@@ -19,7 +21,8 @@ TEST(Vector2Test, ElementAssignment) {
   EXPECT_EQ(vec(1), 10.0f);
 }
 
-TEST(Vector2Test, Magnitude) {
+TEST(Vector2Test, Magnitude) 
+{
   Vector<2,float> vec;
   vec(0) = 0.0f;
   vec(1) = 0.0f;
@@ -35,7 +38,8 @@ TEST(Vector2Test, Magnitude) {
   EXPECT_EQ(vec.magnitude(), 5.0f);
 }
 
-TEST(Vector2Test, Unit) {
+TEST(Vector2Test, Unit) 
+{
   Vector<2,float> vec;
   Vector<2,float> unitVec;
   vec(0) = 0.0f;
@@ -60,7 +64,8 @@ TEST(Vector2Test, Unit) {
   EXPECT_EQ(unitVec(1), 0.8f);
 }
 
-TEST(Vector2Test, Normalize) {
+TEST(Vector2Test, Normalize) 
+{
   Vector<2,float> vec;
   vec(0) = 0.0f;
   vec(1) = 0.0f;
@@ -84,7 +89,8 @@ TEST(Vector2Test, Normalize) {
   EXPECT_EQ(vec(1), 0.8f);
 }
 
-TEST(Vector2Test, Dot) {
+TEST(Vector2Test, Dot) 
+{
   Vector<2,float> vecA, vecB;
   float result;
   vecA(0) = 0.0f;
@@ -95,7 +101,8 @@ TEST(Vector2Test, Dot) {
   EXPECT_EQ(result, 2.0f);
 }
 
-TEST(Vector2Test, Addition) {
+TEST(Vector2Test, Addition) 
+{
   Vector<2,float> vecA, vecB, vecC, vecD;
   vecA(0) = 0.0f;
   vecA(1) = 1.0f;
@@ -109,7 +116,8 @@ TEST(Vector2Test, Addition) {
   EXPECT_EQ(vecD(1), 1.0f);  
 }
 
-TEST(Vector2Test, Subtraction) {
+TEST(Vector2Test, Subtraction) 
+{
   Vector<2,float> vecA, vecB, vecC, vecD;
   vecA(0) = 0.0f;
   vecA(1) = 1.0f;
@@ -123,7 +131,8 @@ TEST(Vector2Test, Subtraction) {
   EXPECT_EQ(vecD(1), -1.0f);  
 }
 
-TEST(Vector2Test, Multiplication) {
+TEST(Vector2Test, Multiplication) 
+{
   Vector<2,float> vec, result;
   vec(0) =  10.0f;
   vec(1) = -10.0f;
@@ -137,7 +146,8 @@ TEST(Vector2Test, Multiplication) {
   EXPECT_EQ(vec(1), 0.0f);  
 }
 
-TEST(Vector2Test, Division) {
+TEST(Vector2Test, Division) 
+{
   Vector<2,float> vec, result;
   vec(0) =  10.0f;
   vec(1) = -10.0f;

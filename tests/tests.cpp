@@ -7,7 +7,8 @@
 
 // Include test headers here:
 #include "Vector2Test.h"
-
+#include "CellTest.h"
+#include "GridTest.h"
 
 // TODO - YUCK - This global variable is a temporary hack!!!
 FluidSolver *solver = NULL;
