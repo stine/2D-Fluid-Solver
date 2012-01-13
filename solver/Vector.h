@@ -71,15 +71,19 @@ T Vector<N, T>::magnitude() const
 template<unsigned N, class T>
 Vector<N, T>& Vector<N, T>::normalize()
 {
-  T mag = (*this).magnitude();
-  return *this /= mag;
+  *this = unit();
+  return *this;
 }
 
 template<unsigned N, class T>
 Vector<N, T> Vector<N, T>::unit() const
 {
+  Vector<N, T> result;
   T mag = (*this).magnitude();
-  return *this / mag;
+  if (mag != 0) {
+    result = *this / mag;
+  }
+  return result;
 }
 
 template<unsigned N, class T>

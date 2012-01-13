@@ -5,7 +5,9 @@
 #include "Grid.h"
 #include "FluidSolver.h"
 
-using namespace std;
+// Include test headers here:
+#include "Vector2Test.h"
+
 
 // TODO - YUCK - This global variable is a temporary hack!!!
 FluidSolver *solver = NULL;
