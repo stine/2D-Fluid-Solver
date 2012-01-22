@@ -1,5 +1,6 @@
 QT      += core gui opengl
 CONFIG  += warn_on
+CONFIG  -= app_bundle
 
 OBJECTS_DIR = ../tmp
 MOC_DIR     = ../tmp
