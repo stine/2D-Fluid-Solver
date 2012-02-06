@@ -130,6 +130,9 @@ public:
 private:
   // Creates linkage between neighboring cells.
   void setCellLinkage();
+
+  // Calculates bilinear interpolation for an x and y position
+  float bilerpVel(float x, float y, Cell::Dimension dim) const;
 };
 
 

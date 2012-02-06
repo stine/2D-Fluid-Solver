@@ -47,6 +47,13 @@ Grid::~Grid()
   }
 }
 
+Vector<2,float> Grid::getVelocity(float x, float y) const
+{
+  Vector<2,float> result;
+  result(0) = bilerpVel(x, y, Cell::X);
+  result(1) = bilerpVel(x, y, Cell::Y); 
+  return result;
+}
 
 void Grid::setCellLinkage() 
 {
@@ -70,3 +77,43 @@ void Grid::setCellLinkage()
     }
   }
 }
+
+float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
+{
+  int i, j = 0;
+  float fx, fy = 0;
+
+  switch(dim) {
+    case Cell::X:
+      y -= 0.5;
+      break;
+
+    case Cell::Y:
+      x -= 0.5;
+      break;
+
+    default:
+      // TODO: Put error message here in the future
+      break;
+  }
+
+  i = floor(x);
+  j = floor(y);
+  fx = x - i;
+  fy = y - j;
+  
+  printf("%f,%f\n", x, y);
+
+  float thisVel = (*this)(i,j).vel[dim];
+  float rightVel = (*this)(i,j).neighbors[Cell::POS_X]->vel[dim];
+  float topVel = (*this)(i,j).neighbors[Cell::POS_Y]->vel[dim];
+  float topRightVel = (*this)(i,j).neighbors[Cell::POS_XY]->vel[dim];
+
+  return thisVel*(1-fx)*(1-fy)+
+         rightVel*fx*(1-fy)+
+         topVel*(1-fx)*fy+
+         topRightVel*fx*fy;
+}
+
+
+
