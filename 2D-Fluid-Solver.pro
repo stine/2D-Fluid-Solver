@@ -1,6 +1,11 @@
-include(config.pri)
+CONFIG  += ordererd
 
 TEMPLATE = subdirs
-CONFIG  += ordered
-SUBDIRS  = tests \
+SUBDIRS  = solver \
+           ui \
+           renderers \
+           tests \
            main
+
+tests.depends = solver ui renderers
+main.depends  = solver ui renderers
