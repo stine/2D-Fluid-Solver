@@ -5,7 +5,12 @@
 *.gch
 *.app
 moc_*
-tmp
-Makefile
+.obj
+.moc
+.rcc
+.ui
+Makefile*
+debug
+release
 solver-tests
 2D-Fluid-Solver

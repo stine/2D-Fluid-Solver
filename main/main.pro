@@ -1,7 +1,6 @@
-! include(../sources.pri) {
-  error(Couldn't find the sources.pri file)
-}
+include(../sources.pri)
 
 TEMPLATE = app
+TARGET   = 2D-Fluid-Solver
+
 SOURCES += main.cpp
-TARGET   = ../2D-Fluid-Solver

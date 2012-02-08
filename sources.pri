@@ -1,27 +1,35 @@
-QT      += core gui opengl
-CONFIG  += warn_on
-CONFIG  -= app_bundle
+include(../config.pri)
 
-OBJECTS_DIR = ../tmp
-MOC_DIR     = ../tmp
-UI_DIR      = ../tmp
+BaseDirectory = ..
 
-INCLUDEPATH += ../ui \
-               ../solver \
-               ../renderers
+Release:DESTDIR     = $$BaseDirectory/release
+Release:OBJECTS_DIR = $$BaseDirectory/release/.obj
+Release:MOC_DIR     = $$BaseDirectory/release/.moc
+Release:RCC_DIR     = $$BaseDirectory/release/.rcc
+Release:UI_DIR      = $$BaseDirectory/release/.ui
 
-SOURCES += ../ui/MainWindow.cpp \
-           ../ui/QRendererWidget.cpp \
-           ../solver/FluidSolver.cpp \
-           ../solver/Grid.cpp \
-           ../solver/Cell.cpp \
-           ../renderers/CompatibilityRenderer.cpp
+Debug:DESTDIR     = $$BaseDirectory/debug
+Debug:OBJECTS_DIR = $$BaseDirectory/debug/.obj
+Debug:MOC_DIR     = $$BaseDirectory/debug/.moc
+Debug:RCC_DIR     = $$BaseDirectory/debug/.rcc
+Debug:UI_DIR      = $$BaseDirectory/debug/.ui
 
-HEADERS += ../ui/MainWindow.h \
-           ../ui/QRendererWidget.h \
-           ../solver/Vector.h \
-           ../solver/Cell.h \
-           ../solver/FluidSolver.h \
-           ../solver/Grid.h \
-           ../renderers/IFluidRenderer.h \
-           ../renderers/CompatibilityRenderer.h
+INCLUDEPATH += $$BaseDirectory/ui \
+               $$BaseDirectory/solver \
+               $$BaseDirectory/renderers
+
+SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
+           $$BaseDirectory/ui/QRendererWidget.cpp \
+           $$BaseDirectory/solver/FluidSolver.cpp \
+           $$BaseDirectory/solver/Grid.cpp \
+           $$BaseDirectory/solver/Cell.cpp \
+           $$BaseDirectory/renderers/CompatibilityRenderer.cpp
+
+HEADERS += $$BaseDirectory/ui/MainWindow.h \
+           $$BaseDirectory/ui/QRendererWidget.h \
+           $$BaseDirectory/solver/Vector.h \
+           $$BaseDirectory/solver/Cell.h \
+           $$BaseDirectory/solver/FluidSolver.h \
+           $$BaseDirectory/solver/Grid.h \
+           $$BaseDirectory/renderers/IFluidRenderer.h \
+           $$BaseDirectory/renderers/CompatibilityRenderer.h
