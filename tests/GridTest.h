@@ -131,7 +131,7 @@ TEST_F(GridTest, SetCellLinkage)
 
 TEST_F(GridTest, GetVelocity)
 {
-  // TODO, pass test by default.
+  EXPECT_EQ(2.0f, testGrid.getVelocity(1.5, 1)(0));
 }
 
 TEST_F(GridTest, GetPressureGradient)
