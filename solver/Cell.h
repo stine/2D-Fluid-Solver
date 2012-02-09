@@ -38,24 +38,6 @@ struct Cell {
   //   None
   Cell();
 
-  // Copy Constuctor, duplicates a cell.
-  // Does NOT copy linkage between cells, however. This must be done from a 
-  // higher level (Grid class).
-  //
-  // Arguments:
-  //   Cell &cell - The cell to copy values from.
-  Cell(const Cell &cell);
-
-  // Assignment operator, duplicates a cell.
-  // Does NOT copy linkage between cells, however. This must be done from a 
-  // higher level (Grid class).
-  //
-  // Arguments:
-  //   Cell &cell - The cell to copy values from.
-  // Returns:
-  //   Cell & - A reference to this cell.
-  Cell& operator=(const Cell& cell);
-
   // Realizes the staged velocity (previously set via stageVel) as the cell's
   // current velocity. "stagedVel"'s value isn't modified.
   //

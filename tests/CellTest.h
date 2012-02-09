@@ -53,9 +53,9 @@ TEST_F(CellTest, CopyConstructor)
     EXPECT_EQ(testCell.stagedVel[i], newCell.stagedVel[i]);
   }
   EXPECT_EQ(testCell.isLiquid, newCell.isLiquid);
-  EXPECT_FALSE(newCell.allNeighbors);
+  EXPECT_EQ(testCell.allNeighbors, newCell.allNeighbors);
   for (int i = 0; i < Cell::NEIGHBOR_COUNT; ++i) {
-    EXPECT_EQ(NULL, newCell.neighbors[i]);
+    EXPECT_EQ(testCell.neighbors[i], newCell.neighbors[i]);
   }
 }
 
@@ -69,9 +69,9 @@ TEST_F(CellTest, Assignment)
     EXPECT_EQ(testCell.stagedVel[i], newCell.stagedVel[i]);
   }
   EXPECT_EQ(testCell.isLiquid, newCell.isLiquid);
-  EXPECT_FALSE(newCell.allNeighbors);
+  EXPECT_EQ(testCell.allNeighbors, newCell.allNeighbors);
   for (int i = 0; i < Cell::NEIGHBOR_COUNT; ++i) {
-    EXPECT_EQ(NULL, newCell.neighbors[i]);
+    EXPECT_EQ(testCell.neighbors[i], newCell.neighbors[i]);
   }
 }
 

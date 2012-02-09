@@ -102,12 +102,11 @@ float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
   fx = x - i;
   fy = y - j;
   
-  printf("%f,%f\n", x, y);
-
-  float thisVel = (*this)(i,j).vel[dim];
-  float rightVel = (*this)(i,j).neighbors[Cell::POS_X]->vel[dim];
-  float topVel = (*this)(i,j).neighbors[Cell::POS_Y]->vel[dim];
-  float topRightVel = (*this)(i,j).neighbors[Cell::POS_XY]->vel[dim];
+  Cell cell = (*this)(i,j);
+  float thisVel  = cell.vel[dim];
+  float rightVel = cell.neighbors[Cell::POS_X]->vel[dim];
+  float topVel   = cell.neighbors[Cell::POS_Y]->vel[dim];
+  float topRightVel = cell.neighbors[Cell::POS_XY]->vel[dim];
 
   return thisVel*(1-fx)*(1-fy)+
          rightVel*fx*(1-fy)+
