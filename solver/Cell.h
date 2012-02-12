@@ -8,6 +8,13 @@
 //   is because in a MAC (Marker-and-Cell) Grid, each velocity component is
 //   stored normal to a different face on the containing cell.
 struct Cell {
+  // Enumerated type to determine contents of Cell.
+  enum Type {
+    AIR = 0,
+    FLUID,
+    SOLID,
+    TYPE_COUNT
+  };
   // Enumerated type used in the Cell struct to enumerate Neighbors.
   enum Neighbor {   
     POS_X = 0,
@@ -27,7 +34,7 @@ struct Cell {
   float pressure;             // Pressure, as sampled at the center of this cell
   float vel[DIM_COUNT];       // Velocity component, as sampled at the faces.
   float stagedVel[DIM_COUNT]; // Temp vel. component, as sampled at faces.
-  bool  isLiquid;             // Flag, true if the cell contains liquid.
+  Type  cellType;             // Contents type of this cell.
   bool  allNeighbors;         // Flag, true if all four neighbors are in grid.
   Cell *neighbors[NEIGHBOR_COUNT]; // Pointers to neighbor cells.
 

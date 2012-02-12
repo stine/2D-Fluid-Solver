@@ -2,7 +2,7 @@
 
 Cell::Cell()
   : pressure(0.0f),
-    isLiquid(false),
+    cellType(AIR),
     allNeighbors(false)
 {
   // Initialize arrays.

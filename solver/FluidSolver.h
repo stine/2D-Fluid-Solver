@@ -8,25 +8,13 @@
 
 class FluidSolver : public QObject
 {
-  const unsigned  _rowCount;    // The number of rows in the sim.
-  const unsigned  _colCount;    // The number of columns in the sim.
+  const float     _width;       // The width of the simulation.
+  const float     _height;      // The height of the simulation.
   Grid            _grid;        // The 2D MAC Grid.
   Vector<2,float> _maxVelocity; // The maximum velocity seen last timestep.
   // TODO vector<MarkerParticle>
 
 public:
-  // Constructs a 2D fluid simulation of the specified size.  Currently
-  // each cell is 1.0f units by 1.0f units in size.
-  //
-  // Arguments:
-  //   unsigned rowCount - The number of rows of cells in the simulation.
-  //   unsigned colCount - The number of columns of cells in the simulation.
-  //   vector<bool> initialFluid - Array of flags representing initial state.
-  FluidSolver
-    (unsigned rowCount,
-     unsigned colCount,
-     const std::vector<bool> &initialFluid);
-
   // Constructs a 2D fluid simulation around the specified initial grid.  Currently
   // each cell is 1.0f units by 1.0f units in size.
   //
@@ -60,8 +48,8 @@ public:
   //   None
   // 
   // Returns:
-  //   unsigned - The width of the simulation.
-  unsigned getSimulationWidth() const;
+  //   float - The width of the simulation.
+  float getSimulationWidth() const;
   
   // Returns the simulation height.
   //
@@ -69,8 +57,8 @@ public:
   //   None
   // 
   // Returns:
-  //   unsigned - The height of the simulation.
-  unsigned getSimulationHeight() const;
+  //   float - The height of the simulation.
+  float getSimulationHeight() const;
 
 protected:
   // Advects the fluid's velocity field via a backward particle trace.

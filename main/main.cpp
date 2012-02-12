@@ -21,15 +21,15 @@ int main(int argc, char *argv[])
   // Note: values in this velocity field are arbitrarily chosen and may be
   //  divergent within a cell.
   // Note: sin() is used to clamp output values to [-1, 1].
-  const unsigned rows = 3;
-  const unsigned cols = 3;
-  const unsigned size = rows * cols;
-  Grid grid(3, 3);
-  for (unsigned i = 0; i < size; ++i) {
-    grid[i].isLiquid = true;
-    grid[i].pressure = 1.0f;
-    grid[i].vel[Cell::X] = sin(i * 45.215 + 88.15468) / 2; // arbitrary constants
-    grid[i].vel[Cell::Y] = sin(i * 2.548 + 121.1215) / 2;  // arbitrary constants
+  float width = 3.0f;
+  float height = 3.0f;
+  Grid grid(width, height);
+  for (float y = 0; y < height; ++y) 
+    for (float x = 0; x < width; ++x) {
+      grid(x,y).cellType = Cell::FLUID;
+      grid(x,y).pressure = 1.0f;
+      grid(x,y).vel[Cell::X] = sin(x * 45.215 + y * 88.15468) / 2; // arbitrary constants
+      grid(x,y).vel[Cell::Y] = sin(x * 2.548 + y * 121.1215) / 2;  // arbitrary constants
   }
 
   // Instantiate the Fluid Solver using the initial velocity field.

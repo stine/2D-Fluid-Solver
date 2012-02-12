@@ -114,7 +114,7 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
   glDepthMask(GL_FALSE);
   for (unsigned y = 0; y < height; ++y) {
     for (unsigned x = 0; x < width; ++x) {
-      if (grid(x, y).isLiquid) {
+      if (grid(x, y).cellType == Cell::FLUID) {
 	glBegin(GL_TRIANGLES);
 	glVertex2f(x, y);
 	glVertex2f(x+1, y);
@@ -142,6 +142,18 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
       glBegin(GL_LINES);
       glVertex2f(x + 0.5f, y);
       glVertex2f(x + 0.5f, y + yV);
+      glEnd();
+    }
+  }
+
+  // Draw the velocity vector at the center of each cell.
+  glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+  for (float y = 0.5f; y < grid.getHeight(); y += 1.0f) {
+    for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
+      Vector<2,float> vec = grid.getVelocity(x, y);
+      glBegin(GL_LINES);
+      glVertex2f(x, y);
+      glVertex2f(x + vec(0), y + vec(1));
       glEnd();
     }
   }

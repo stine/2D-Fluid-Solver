@@ -10,15 +10,17 @@ class Grid {
   unsigned _rowCount;  // The number of rows in the sim.
   unsigned _colCount;  // The number of columns in the sim.
   std::vector<Cell> _cells;  // STL Vector of all managed cells.
+  const static unsigned _minSize = 3; // Minimum size of grid in any dim.
 
 public:
-  // Constructs an instance of Grid of size rowCount by colCount. Currently
-  // each cell is hardcoded at 1.0f units by 1.0f units in size.
+  // Constructs an instance of Grid of size width by height. Width and height
+  // are to be provided in world coordinates.  The Grid class produces a MAC
+  // grid of size that rounds up to the nearest integer in each dimension.
   //
   // Arguments:
-  //   unsigned rowCount - The number of rows of cells in the simulation. 
-  //   unsigned colCount - The number of columns of cells in the simulation.
-  Grid(unsigned rowCount, unsigned colCount);
+  //   float width - The width of the simulation in world coordinates.
+  //   float height - The height of the simulation in world coordinates.
+  Grid(float width, float height);
 
   // Copy constructs an instance of Grid.
   //
@@ -82,6 +84,8 @@ public:
 
   // Get the velocity at a location within the grid. This performs a bilinear
   // interpolation between values in neighboring cells per component.
+  // NOTE: x and y are expected to be range supplied at construction time
+  // of this Grid class, where x = [0.0f, width), y = [0.0f, height)
   // 
   // Arguments:
   //   float x - The x coordinate within this cell to sample from.
@@ -111,7 +115,27 @@ public:
   //   float - The divergence of the velocity field within this cell.
   float getVelocityDivergence(unsigned x, unsigned y) const;
 
-  // Gets the number of rows in the grid.
+  // Gets the simulation height supported by this grid, in world coordinates.
+  //
+  // Arguments:
+  //   None
+  // Returns:
+  //   float - The simulation height supported by this grid.
+  inline float getHeight() const;
+
+  // Gets the simulation width supported by this grid, in world coordinates.
+  //
+  // Arguments:
+  //   None
+  // Returns:
+  //   float - The simulation width supported by this grid.
+  inline float getWidth() const;
+
+  // Gets the number of rows in the MAC grid.
+  // NOTE: The top row of the grid exceeds the bounds of the simulation.
+  // This row is used to store the y-velocities at the top of the sim.
+  // To determine the height of the simulation that is represented by this
+  // grid, use getHeight() instead.
   //
   // Arguments:
   //   None
@@ -119,7 +143,11 @@ public:
   //   unsigned - The number of rows in the grid.
   inline unsigned getRowCount() const;
 
-  // Gets the number of cols in the grid.
+  // Gets the number of columns in the MAC grid.
+  // NOTE: The far right of the grid exceeds the bounds of the simulation.
+  // This column is used to store the y-velocities at the top of the sim.
+  // To determine the height of the simulation that is represented by this
+  // grid, use getHeight() instead.
   //
   // Arguments:
   //   None
@@ -131,8 +159,23 @@ private:
   // Creates linkage between neighboring cells.
   void setCellLinkage();
 
-  // Calculates bilinear interpolation for an x and y position
+  // Calculates a velocity component at the given world location in the MAC grid.
   float bilerpVel(float x, float y, Cell::Dimension dim) const;
+
+  // Utility function to perform bilinear interpolation between four values.
+  // 
+  // Arguments:
+  //   float x - X coordinate of the desired value.  Domain [0.0, 1.0]
+  //   float y - Y coordinate of the desired value.  Domain [0.0, 1.0]
+  //   float originVal - Value at (0, 0)
+  //   float posXVal   - Value at (0, 1)
+  //   float posYVal   - Value at (1, 0)
+  //   float posXYVal  - Value at (1, 1)
+  // Returns:
+  //   float - Bilinearly interpolated value at the specified location.
+  inline float bilerp(float x, float y,
+		      float originVal, float posXVal,
+		      float posYVal, float posXYVal) const;
 };
 
 
@@ -162,6 +205,18 @@ Cell Grid::operator[](unsigned index) const
 }
 
 
+float Grid::getHeight() const
+{
+  return static_cast<float>(_rowCount - 1);
+}
+
+
+float Grid::getWidth() const
+{
+  return static_cast<float>(_colCount - 1);
+}
+
+
 unsigned Grid::getRowCount() const
 {
   return _rowCount;
@@ -172,5 +227,17 @@ unsigned Grid::getColCount() const
 {
   return _colCount;
 }
+
+
+float Grid::bilerp(float x, float y,
+		   float originVal, float posXVal,
+		   float posYVal, float posXYVal) const 
+{
+  return (1-x) * (1-y) * originVal +
+         x     * (1-y) * posXVal +
+         (1-x) * y     * posYVal +
+         x     * y     * posXYVal;
+}
+
 
 #endif //__GRID_H__
