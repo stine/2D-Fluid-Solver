@@ -12,6 +12,13 @@ TEST(Vector2Test, DefaultConstructor)
   EXPECT_EQ(defaultVec(1), 0.0f);
 }
 
+TEST(Vector2Test, ValueConstructor)
+{
+  const Vector<2,float> defaultVec(5.0f, -5.0f);
+  EXPECT_EQ(defaultVec(0), 5.0f);
+  EXPECT_EQ(defaultVec(1), -5.0f);
+}
+
 TEST(Vector2Test, ElementAssignment) 
 {
   Vector<2,float> vec;

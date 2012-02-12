@@ -11,7 +11,7 @@ class Vector {
 public:
   // Default Constructor
   Vector();
-  //Vector<N,T>(T * first element of array);
+  Vector<N,T>(T x, T y);
 
   // Element access 
   T& operator()(const unsigned &index);
@@ -43,6 +43,13 @@ Vector<N, T>::Vector()
 {
   for (unsigned i = 0; i < N; ++i)
     _val[i] = 0;
+}
+
+template<unsigned N, class T>
+Vector<N,T>::Vector(T x, T y)
+{
+  _val[0] = x;
+  _val[1] = y;
 }
 
 // Element access operator overloading
