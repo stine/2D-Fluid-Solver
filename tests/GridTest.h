@@ -219,6 +219,13 @@ TEST_F(GridTest, GetVelocity)
   EXPECT_EQ(1.5f, edgeTestGrid.getVelocity(3.0, 3.0)(1));
 }
 
+TEST_F(GridTest, GetMaxVelocity)
+{
+  // Fetch maximum velocity from testGrid.
+  Vector<2,float> maxVel(2.5, 2.5);
+  EXPECT_EQ(maxVel, testGrid.getMaxVelocity());
+}
+
 TEST_F(GridTest, GetPressureGradient)
 {
   // TODO, pass test by default.

@@ -47,13 +47,36 @@ Grid::~Grid()
   }
 }
 
+
 Vector<2,float> Grid::getVelocity(float x, float y) const
 {
+  // Since the X and Y components of velocity are stored at different locations
+  // in world space, a bilinear interpolation must be performed per-component
+  // to determine the velocity at any point in the MAC grid.
   Vector<2,float> result;
   result(0) = bilerpVel(x, y, Cell::X);
   result(1) = bilerpVel(x, y, Cell::Y);
   return result;
 }
+
+
+Vector<2,float> Grid::getMaxVelocity() const
+{
+  // Iterate through all MAC cell centers, finding the maximum velocity.
+  // Note that this is an incredibly naive and expensive approach to 
+  // estimating the maximum velocity in the grid.  Consider revising
+  // this in the future.
+  Vector<2,float> maxVel;
+  for (float y = 0.5f; y < getHeight(); ++y)
+    for (float x = 0.5f; x < getWidth(); ++x) {
+      Vector<2,float> vel = getVelocity(x, y);
+      if (vel.magnitude() > maxVel.magnitude())
+	maxVel = vel;
+    }
+  
+  return maxVel;
+}
+
 
 void Grid::setCellLinkage() 
 {
@@ -86,6 +109,7 @@ void Grid::setCellLinkage()
   }
 }
 
+
 float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
 {
   // Ensure that incoming x and y values are not greater than the
@@ -97,7 +121,15 @@ float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
   if (y > getHeight())
     y = getHeight();
 
-  // TODO comment about offsets.
+  // In a MAC Grid, the X and Y velocities are offset from the centerpoint
+  // of a MAC cell by half the cell width.  In other words, if the center
+  // of a cell is at local (0.5, 0.5), the X velocity for the cell is
+  // sampled and stored at (0, 0.5), and the Y velocity for the cell is
+  // sampled and stored at (0.5, 0).  This is to help with calculating
+  // an accurate central difference across the cell.
+  // Here, an offset is applied to the provided X or Y coordinate to
+  // adjust for this velocity component offset in bilinear interpolation.
+  // See documentation on the MAC grid for a deeper explanation.
   switch(dim) {
     case Cell::X:
       y -= 0.5;
@@ -118,8 +150,8 @@ float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
     y = 0.0f;
 
   // Determine the base and fractional cell index for interpolation.
-  unsigned i, j = 0;
-  float fi, fj = 0;
+  unsigned i, j;
+  float fi, fj;
   i = floor(x);
   j = floor(y);
   fi = x - i;
@@ -128,26 +160,25 @@ float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
   // Get the base cell.
   Cell cell = (*this)(i,j);
 
-  // If all neighbors are present, use direct bilinear interpolation.
+  float thisVel, rightVel, topVel, topRightVel;
+  // If all neighbors are present, get the velocity value from each.
   if (cell.allNeighbors) {
-    float thisVel  = cell.vel[dim];
-    float rightVel = cell.neighbors[Cell::POS_X]->vel[dim];
-    float topVel   = cell.neighbors[Cell::POS_Y]->vel[dim];
-    float topRightVel = cell.neighbors[Cell::POS_XY]->vel[dim];
-    return bilerp(fi, fj, thisVel, rightVel, topVel, topRightVel);
+    thisVel  = cell.vel[dim];
+    rightVel = cell.neighbors[Cell::POS_X]->vel[dim];
+    topVel   = cell.neighbors[Cell::POS_Y]->vel[dim];
+    topRightVel = cell.neighbors[Cell::POS_XY]->vel[dim];
   }
-  // Else, perform additional checks 
+  // Else, set missing neighbors to 0 velocity.
   else {
-    float thisVel  = cell.vel[dim];
-    float rightVel = cell.neighbors[Cell::POS_X]
+    thisVel  = cell.vel[dim];
+    rightVel = cell.neighbors[Cell::POS_X]
       ? cell.neighbors[Cell::POS_X]->vel[dim] : 0;
-    float topVel   = cell.neighbors[Cell::POS_Y]
+    topVel   = cell.neighbors[Cell::POS_Y]
       ? cell.neighbors[Cell::POS_Y]->vel[dim] : 0;
-    float topRightVel = cell.neighbors[Cell::POS_XY]
+    topRightVel = cell.neighbors[Cell::POS_XY]
       ? cell.neighbors[Cell::POS_XY]->vel[dim] : 0;
-    return bilerp(fi, fj, thisVel, rightVel, topVel, topRightVel);
   }
+
+  // Perform the bilinear interpolation.
+  return bilerp(fi, fj, thisVel, rightVel, topVel, topRightVel);
 }
-
-
-

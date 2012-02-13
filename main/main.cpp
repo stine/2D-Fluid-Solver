@@ -1,4 +1,5 @@
 #include <QtGui/QApplication>
+#include <QTimer>
 #include <vector>
 #include <algorithm>
 #include "MainWindow.h"
@@ -40,7 +41,10 @@ int main(int argc, char *argv[])
   window.resize(window.sizeHint());
   window.show();
 
-  // ...timer...?
+  // Kick off a timer to calculate new frames.
+  QTimer *timer = new QTimer(solver);
+  QObject::connect(timer, SIGNAL(timeout()), solver, SLOT(advanceFrame()));
+  timer->start();
 
   // Begin the Qt event loop.
   return app.exec();

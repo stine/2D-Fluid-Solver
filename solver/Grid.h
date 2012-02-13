@@ -115,10 +115,22 @@ public:
   //   float - The divergence of the velocity field within this cell.
   float getVelocityDivergence(unsigned x, unsigned y) const;
 
+  // Calculates the maximum velocity in the grid by sampling the center
+  // of each MAC cell.  This is currently an expensive operation due to
+  // naive implementation.
+  //
+  // Arguments:
+  //   None
+  //
+  // Returns:
+  //   Vector<2,float> - The maximum velocity since resetMaxVelocity().
+  Vector<2,float> getMaxVelocity() const;
+
   // Gets the simulation height supported by this grid, in world coordinates.
   //
   // Arguments:
   //   None
+  //
   // Returns:
   //   float - The simulation height supported by this grid.
   inline float getHeight() const;
@@ -127,6 +139,7 @@ public:
   //
   // Arguments:
   //   None
+  //
   // Returns:
   //   float - The simulation width supported by this grid.
   inline float getWidth() const;
@@ -139,6 +152,7 @@ public:
   //
   // Arguments:
   //   None
+  //
   // Returns:
   //   unsigned - The number of rows in the grid.
   inline unsigned getRowCount() const;
@@ -151,6 +165,7 @@ public:
   //
   // Arguments:
   //   None
+  //
   // Returns:
   //   unsigned - The number of cols in the grid.
   inline unsigned getColCount() const;
