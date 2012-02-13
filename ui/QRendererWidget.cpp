@@ -70,4 +70,5 @@ void QRendererWidget::resizeGL(int width, int height)
 void QRendererWidget::paintGL()
 {
   solver->draw(_renderer);
+  update();
 }

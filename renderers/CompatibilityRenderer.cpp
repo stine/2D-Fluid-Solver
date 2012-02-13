@@ -11,6 +11,7 @@ QGLFormat CompatibilityRenderer::getFormat()
   // Specify the necessary OpenGL context attributes for this renderer.
   QGLFormat glFormat;
   glFormat.setVersion(2, 1);
+  glFormat.setSwapInterval(1);
   return glFormat;
 }
 
