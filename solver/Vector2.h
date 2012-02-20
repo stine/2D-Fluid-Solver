@@ -45,7 +45,7 @@ Vector2& Vector2::zero()
 
 Vector2 Vector2::negate()
 {
-  return Vector2(x * -1.0f, y * -1.0f);
+  return Vector2(x, y) * -1.0f;
 }
 
 float Vector2::magnitude() const
@@ -61,12 +61,9 @@ Vector2& Vector2::normalize()
 
 Vector2 Vector2::unit() const
 {
-  Vector2 result;
   float mag = (*this).magnitude();
-  if (mag != 0) {
-    result = *this / mag;
-  }
-  return result;
+  if (mag != 0) 
+    return *this / mag;
 }
 
 float Vector2::dot(const Vector2 &rhs) const
@@ -92,7 +89,7 @@ Vector2 Vector2::operator*(const float &rhs) const
 
 Vector2 Vector2::operator/(const float &rhs) const
 {
-  return Vector2(x * rhs, y * rhs);
+  return Vector2(x / rhs, y / rhs);
 }
 
 Vector2& Vector2::operator+=(const Vector2 &rhs)
