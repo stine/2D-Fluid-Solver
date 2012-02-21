@@ -13,7 +13,11 @@ public:
 
   // Vector math operators
   Vector2& zero();
-  Vector2 negate();
+  Vector2& zeroX();
+  Vector2& zeroY();
+  Vector2 negate() const;
+  Vector2 negateX() const;
+  Vector2 negateY() const;
   float magnitude() const;
   Vector2 unit() const;
   Vector2& normalize();
@@ -43,9 +47,29 @@ Vector2& Vector2::zero()
   x = y = 0.0f;
 }
 
-Vector2 Vector2::negate()
+Vector2& Vector2::zeroX()
+{
+  x = 0.0f; 
+}
+
+Vector2& Vector2::zeroY()
+{
+  y = 0.0f;
+}
+
+Vector2 Vector2::negate() const
 {
   return Vector2(x, y) * -1.0f;
+}
+
+Vector2 Vector2::negateX() const
+{
+  return Vector2(x * -1.0f, y);
+}
+
+Vector2 Vector2::negateY() const
+{
+  return Vector2(x, y * -1.0f);
 }
 
 float Vector2::magnitude() const
