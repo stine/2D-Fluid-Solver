@@ -51,7 +51,7 @@ QSize QRendererWidget::minimumSizeHint() const
 
 QSize QRendererWidget::sizeHint() const
 {
-  return QSize(400, 400);
+  return QSize(1000, 1000);
 }
 
 

@@ -50,7 +50,7 @@ void FluidSolver::advanceTimeStep(float timeStepSec)
 
   advectVelocity(timeStepSec);
   applyGlobalVelocity(gravity * timeStepSec);
-  boundaryCollide();
+//  boundaryCollide();
   pressureSolve();
   moveParticles(timeStepSec);
 }
@@ -58,7 +58,39 @@ void FluidSolver::advanceTimeStep(float timeStepSec)
 
 void FluidSolver::advectVelocity(float timeStepSec)
 {
-  // TODO
+  for(float x = 0; x < _grid.getWidth(); x += 1.0f)
+    for( float y = 0.5; y < _grid.getHeight(); y += 1.0f) {
+      Cell &cell = _grid(floor(x), floor(y));
+      Vector<2, float> position(x, y); 
+      position += _grid.getVelocity(x, y) * -timeStepSec;
+      if (position(0) < 0)
+        position(0) = 0;
+      if (position(1) > _grid.getWidth())
+        position(0) = _grid.getWidth(); 
+      if (position(1) < 0)
+        position(1) = 0;
+      if (position(1) > _grid.getHeight())
+        position(1) = _grid.getHeight();
+      cell.stagedVel[Cell::X] = _grid.getVelocity(position(0), position(1))(0);
+    }
+  for(float y = 0; y < _grid.getHeight(); y += 1.0f)
+    for(float x = 0.5; x < _grid.getWidth(); x+= 1.0f) {
+      Cell &cell = _grid(floor(x), floor(y));
+      Vector<2, float> position(x, y); 
+      position += _grid.getVelocity(x, y) * -timeStepSec;
+      if (position(0) < 0)
+        position(0) = 0;
+      if (position(1) > _grid.getWidth())
+        position(0) = _grid.getWidth(); 
+      if (position(1) < 0)
+        position(1) = 0;
+      if (position(1) > _grid.getHeight())
+        position(1) = _grid.getHeight();
+      cell.stagedVel[Cell::Y] = _grid.getVelocity(position(0), position(1))(1);
+    }
+  for(unsigned i = 0; i < _grid.getRowCount() * _grid.getColCount(); i++) {
+    _grid[i].commitStagedVel();
+  }
 }
 
 
