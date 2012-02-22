@@ -16,14 +16,16 @@ Debug:UI_DIR      = $$BaseDirectory/debug/.ui
 
 INCLUDEPATH += $$BaseDirectory/ui \
                $$BaseDirectory/solver \
-               $$BaseDirectory/renderers
+               $$BaseDirectory/renderers \
+	       $$BaseDirectory/infrastructure \
 
 SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
            $$BaseDirectory/ui/QRendererWidget.cpp \
            $$BaseDirectory/solver/FluidSolver.cpp \
            $$BaseDirectory/solver/Grid.cpp \
            $$BaseDirectory/solver/Cell.cpp \
-           $$BaseDirectory/renderers/CompatibilityRenderer.cpp
+           $$BaseDirectory/renderers/CompatibilityRenderer.cpp \
+	   $$BaseDirectory/infrastructure/SignalRelay.cpp
 
 HEADERS += $$BaseDirectory/ui/MainWindow.h \
            $$BaseDirectory/ui/QRendererWidget.h \
@@ -32,4 +34,5 @@ HEADERS += $$BaseDirectory/ui/MainWindow.h \
            $$BaseDirectory/solver/FluidSolver.h \
            $$BaseDirectory/solver/Grid.h \
            $$BaseDirectory/renderers/IFluidRenderer.h \
-           $$BaseDirectory/renderers/CompatibilityRenderer.h
+           $$BaseDirectory/renderers/CompatibilityRenderer.h \
+	   $$BaseDirectory/infrastructure/SignalRelay.h

@@ -5,14 +5,54 @@
 #include "IFluidRenderer.h"
 #include "Grid.h"
 #include "Cell.h"
+#include "SignalRelay.h"
 
-FluidSolver::FluidSolver(const Grid &grid)
-  : _width(grid.getWidth()),
-    _height(grid.getHeight()),
-    _grid(grid),
+FluidSolver::FluidSolver(float width, float height)
+  : _width(width),
+    _height(height),
+    _grid(_width, _height),
     _frameReady(false)
-{}
+{
+  // Provide default values to the grid.
+  reset();
 
+  // Connect ourselves to the 'resetSimulation' signal.
+  QObject::connect(SignalRelay::getInstance(), SIGNAL(resetSimulation()),
+		   this, SLOT(reset()));
+}
+
+
+FluidSolver::~FluidSolver()
+{
+  // Disconnect from receiving any signals.
+  SignalRelay::getInstance()->disconnect(this);
+}
+
+
+void FluidSolver::reset()
+{
+  // Note: This is super ghetto currently, and simply initializes the solver
+  // with a large default grid, all filled with fluid and arbitrary velocities.
+  // Change this as needed during devlopment to quickly test stuff out, and
+  // remove before final release!
+  
+  // Initialize a velocity field for testing.
+  // Note: values in this velocity field are arbitrarily chosen and may be
+  //  divergent within a cell.
+  // Note: sin() is used to clamp output values to [-1, 1].
+  Grid grid(_width, _height);
+  for (float y = 0; y < _height; ++y) 
+    for (float x = 0; x < _width; ++x) {
+      grid(x,y).cellType = Cell::FLUID;
+      grid(x,y).pressure = 1.0f;
+      grid(x,y).vel[Cell::X] = sin(x * 45.215 + y * 88.15468) / 2; // arbitrary constants
+      grid(x,y).vel[Cell::Y] = sin(x * 2.548 + y * 121.1215) / 2;  // arbitrary constants
+  }
+
+  // Set values accordingly.
+  _grid = grid;
+  _frameReady = false;
+}
 
 void FluidSolver::advanceFrame()
 {

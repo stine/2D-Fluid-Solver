@@ -12,8 +12,10 @@ namespace Ui {
 class MainWindow : public QWidget
 {
   Q_OBJECT
-  QRendererWidget *_rendWidget;
   QHBoxLayout     *_mainLayout;
+  QVBoxLayout     *_controlLayout;
+  QRendererWidget *_rendWidget;
+  QPushButton     *_resetButton;
     
 public:
   MainWindow();

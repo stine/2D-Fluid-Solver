@@ -19,12 +19,16 @@ private:
   // TODO vector<MarkerParticle>
 
 public:
-  // Constructs a 2D fluid simulation around the specified initial grid.
-  // Currently each cell is 1.0f units by 1.0f units in size.
+  // Constructs a 2D fluid simulation of the specified size.
+  // Currently each cell is 1.0f units by 1.0f units.
   //
   // Arguments:
-  //   Grid &grid - The initial velocity field to use for the fluid simulation.
-  FluidSolver(const Grid &grid);
+  //   float width - The width of the simulation, in world coordinates.
+  //   float height - The height of the simulation, in world coordinates.
+  FluidSolver(float width, float height);
+
+  // Destructs the solver.
+  virtual ~FluidSolver();
 
   // Draws the current state of the simulation using the provided FluidRenderer.
   // 
@@ -68,6 +72,17 @@ public slots:
   // Returns:
   //   None
   void advanceFrame();
+
+  // Resets the simulation to a default starting grid.
+  // This is primarily to be used for debugging during development, and is
+  // expected to change regularly as more capabilities are added.
+  //
+  // Arguments:
+  //   None
+  //
+  // Returns:
+  //   None
+  void reset();
 
 protected:
   // Advances the simulation by a specific amount of time.
