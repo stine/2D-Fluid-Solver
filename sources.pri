@@ -27,7 +27,7 @@ SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
 
 HEADERS += $$BaseDirectory/ui/MainWindow.h \
            $$BaseDirectory/ui/QRendererWidget.h \
-           $$BaseDirectory/solver/Vector.h \
+           $$BaseDirectory/solver/Vector2.h \
            $$BaseDirectory/solver/Cell.h \
            $$BaseDirectory/solver/FluidSolver.h \
            $$BaseDirectory/solver/Grid.h \

@@ -2,7 +2,7 @@
 #define __FLUID_SOLVER_H__
 
 #include "Grid.h"
-#include "Vector.h"
+#include "Vector2.h"
 #include "IFluidRenderer.h"
 
 
@@ -14,7 +14,7 @@ private:
   const float     _width;       // The width of the simulation.
   const float     _height;      // The height of the simulation.
   Grid            _grid;        // The 2D MAC Grid.
-  Vector<2,float> _maxVelocity; // The maximum velocity seen last timestep.
+  Vector2 _maxVelocity; // The maximum velocity seen last timestep.
   bool            _frameReady;  // True if frame's calculations are complete.
   // TODO vector<MarkerParticle>
 
@@ -97,7 +97,7 @@ protected:
   // 
   // Returns:
   //   None
-  void applyGlobalVelocity(Vector<2,float> velocity);
+  void applyGlobalVelocity(Vector2 velocity);
   
   // Solves the system of linear equations that enforce incompressibility
   // of the fluid.  This ensures divergence of the velocity field at each

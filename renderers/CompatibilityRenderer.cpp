@@ -151,10 +151,10 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
   glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
   for (float y = 0.5f; y < grid.getHeight(); y += 1.0f) {
     for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
-      Vector<2,float> vec = grid.getVelocity(x, y);
+      Vector2 vec = grid.getVelocity(x, y);
       glBegin(GL_LINES);
       glVertex2f(x, y);
-      glVertex2f(x + vec(0), y + vec(1));
+      glVertex2f(x + vec.x, y + vec.y);
       glEnd();
     }
   }

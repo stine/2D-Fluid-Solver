@@ -46,7 +46,7 @@ void FluidSolver::advanceFrame()
 
 void FluidSolver::advanceTimeStep(float timeStepSec)
 {
-  Vector<2,float> gravity(0.0f, -0.098);  // Gravity: -0.098 cells/sec^2
+  Vector2 gravity(0.0f, -0.098);  // Gravity: -0.098 cells/sec^2
 
   advectVelocity(timeStepSec);
   applyGlobalVelocity(gravity * timeStepSec);
@@ -61,32 +61,32 @@ void FluidSolver::advectVelocity(float timeStepSec)
   for(float x = 0; x < _grid.getWidth(); x += 1.0f)
     for( float y = 0.5; y < _grid.getHeight(); y += 1.0f) {
       Cell &cell = _grid(floor(x), floor(y));
-      Vector<2, float> position(x, y); 
+      Vector2 position(x, y); 
       position += _grid.getVelocity(x, y) * -timeStepSec;
-      if (position(0) < 0)
-        position(0) = 0;
-      if (position(1) > _grid.getWidth())
-        position(0) = _grid.getWidth(); 
-      if (position(1) < 0)
-        position(1) = 0;
-      if (position(1) > _grid.getHeight())
-        position(1) = _grid.getHeight();
-      cell.stagedVel[Cell::X] = _grid.getVelocity(position(0), position(1))(0);
+      if (position.x < 0)
+        position.x = 0;
+      if (position.y > _grid.getWidth())
+        position.x = _grid.getWidth(); 
+      if (position.y < 0)
+        position.y = 0;
+      if (position.y > _grid.getHeight())
+        position.y = _grid.getHeight();
+      cell.stagedVel[Cell::X] = _grid.getVelocity(position.x, position.y).x;
     }
   for(float y = 0; y < _grid.getHeight(); y += 1.0f)
     for(float x = 0.5; x < _grid.getWidth(); x+= 1.0f) {
       Cell &cell = _grid(floor(x), floor(y));
-      Vector<2, float> position(x, y); 
+      Vector2 position(x, y); 
       position += _grid.getVelocity(x, y) * -timeStepSec;
-      if (position(0) < 0)
-        position(0) = 0;
-      if (position(1) > _grid.getWidth())
-        position(0) = _grid.getWidth(); 
-      if (position(1) < 0)
-        position(1) = 0;
-      if (position(1) > _grid.getHeight())
-        position(1) = _grid.getHeight();
-      cell.stagedVel[Cell::Y] = _grid.getVelocity(position(0), position(1))(1);
+      if (position.x < 0)
+        position.x = 0;
+      if (position.y > _grid.getWidth())
+        position.x = _grid.getWidth(); 
+      if (position.y < 0)
+        position.y = 0;
+      if (position.y > _grid.getHeight())
+        position.y = _grid.getHeight();
+      cell.stagedVel[Cell::Y] = _grid.getVelocity(position.x, position.y).y;
     }
   for(unsigned i = 0; i < _grid.getRowCount() * _grid.getColCount(); i++) {
     _grid[i].commitStagedVel();
@@ -94,13 +94,13 @@ void FluidSolver::advectVelocity(float timeStepSec)
 }
 
 
-void FluidSolver::applyGlobalVelocity(Vector<2,float> velocity)
+void FluidSolver::applyGlobalVelocity(Vector2 velocity)
 {
   // Apply the provided velocity to all cells in the simulation.
   unsigned cellCount = _grid.getRowCount() * _grid.getColCount();
   for (unsigned i = 0; i < cellCount; ++i) {
-    _grid[i].vel[Cell::X] += velocity(0);
-    _grid[i].vel[Cell::Y] += velocity(1);
+    _grid[i].vel[Cell::X] += velocity.x;
+    _grid[i].vel[Cell::Y] += velocity.y;
   }
 }
 

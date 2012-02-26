@@ -3,7 +3,10 @@
 .\#*
 *.o
 *.gch
+*.swp
+*.out
 *.app
+nocommit_*
 moc_*
 .obj
 .moc

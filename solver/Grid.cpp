@@ -48,28 +48,28 @@ Grid::~Grid()
 }
 
 
-Vector<2,float> Grid::getVelocity(float x, float y) const
+Vector2 Grid::getVelocity(float x, float y) const
 {
   // Since the X and Y components of velocity are stored at different locations
   // in world space, a bilinear interpolation must be performed per-component
   // to determine the velocity at any point in the MAC grid.
-  Vector<2,float> result;
-  result(0) = bilerpVel(x, y, Cell::X);
-  result(1) = bilerpVel(x, y, Cell::Y);
+  Vector2 result;
+  result.x = bilerpVel(x, y, Cell::X);
+  result.y = bilerpVel(x, y, Cell::Y);
   return result;
 }
 
 
-Vector<2,float> Grid::getMaxVelocity() const
+Vector2 Grid::getMaxVelocity() const
 {
   // Iterate through all MAC cell centers, finding the maximum velocity.
   // Note that this is an incredibly naive and expensive approach to 
   // estimating the maximum velocity in the grid.  Consider revising
   // this in the future.
-  Vector<2,float> maxVel;
+  Vector2 maxVel;
   for (float y = 0.5f; y < getHeight(); ++y)
     for (float x = 0.5f; x < getWidth(); ++x) {
-      Vector<2,float> vel = getVelocity(x, y);
+      Vector2 vel = getVelocity(x, y);
       if (vel.magnitude() > maxVel.magnitude())
 	maxVel = vel;
     }

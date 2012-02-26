@@ -167,62 +167,62 @@ TEST_F(GridTest, SetCellLinkage)
 TEST_F(GridTest, GetVelocity)
 {
   // Test velocity at (0.0, 0.0)
-  EXPECT_EQ(0.0f, testGrid.getVelocity(0.0, 0)(0));
-  EXPECT_EQ(0.0f, testGrid.getVelocity(0.0, 0)(1));
+  EXPECT_EQ(0.0f, testGrid.getVelocity(0.0, 0).x);
+  EXPECT_EQ(0.0f, testGrid.getVelocity(0.0, 0).y);
 
   // Test velocity at (1.5, 1.0)
-  EXPECT_EQ(1.5f, testGrid.getVelocity(1.5, 1.0)(0));
-  EXPECT_EQ(1.0f, testGrid.getVelocity(1.5, 1.0)(1));
+  EXPECT_EQ(1.5f, testGrid.getVelocity(1.5, 1.0).x);
+  EXPECT_EQ(1.0f, testGrid.getVelocity(1.5, 1.0).y);
 
   // Test velocity at (1.0, 1.5)
-  EXPECT_EQ(1.0f, testGrid.getVelocity(1.0, 1.5)(0));
-  EXPECT_EQ(1.5f, testGrid.getVelocity(1.0, 1.5)(1));
+  EXPECT_EQ(1.0f, testGrid.getVelocity(1.0, 1.5).x);
+  EXPECT_EQ(1.5f, testGrid.getVelocity(1.0, 1.5).y);
 
   // Test velocity at (2.5, 1.5)
-  EXPECT_EQ(2.5f, testGrid.getVelocity(2.5, 1.5)(0));
-  EXPECT_EQ(1.5f, testGrid.getVelocity(2.5, 1.5)(1));
+  EXPECT_EQ(2.5f, testGrid.getVelocity(2.5, 1.5).x);
+  EXPECT_EQ(1.5f, testGrid.getVelocity(2.5, 1.5).y);
 
   // Test velocity at (3.0, 0.0)
-  EXPECT_EQ(3.0f, testGrid.getVelocity(3.0, 0.0)(0));
-  EXPECT_EQ(0.0f, testGrid.getVelocity(3.0, 0.0)(1));
+  EXPECT_EQ(3.0f, testGrid.getVelocity(3.0, 0.0).x);
+  EXPECT_EQ(0.0f, testGrid.getVelocity(3.0, 0.0).y);
 
   // Test velocity at (0.0, 3.0)
-  EXPECT_EQ(0.0f, testGrid.getVelocity(0.0, 3.0)(0));
-  EXPECT_EQ(3.0f, testGrid.getVelocity(0.0, 3.0)(1));
+  EXPECT_EQ(0.0f, testGrid.getVelocity(0.0, 3.0).x);
+  EXPECT_EQ(3.0f, testGrid.getVelocity(0.0, 3.0).y);
 
   // Test velocity at (2.5, 3.0)
-  EXPECT_EQ(2.5f, testGrid.getVelocity(2.5, 3.0)(0));
-  EXPECT_EQ(3.0f, testGrid.getVelocity(2.5, 3.0)(1));
+  EXPECT_EQ(2.5f, testGrid.getVelocity(2.5, 3.0).x);
+  EXPECT_EQ(3.0f, testGrid.getVelocity(2.5, 3.0).y);
 
   // Test velocity at (3.0, 3.0)
-  EXPECT_EQ(3.0f, testGrid.getVelocity(3.0, 3.0)(0));
-  EXPECT_EQ(3.0f, testGrid.getVelocity(3.0, 3.0)(1));
+  EXPECT_EQ(3.0f, testGrid.getVelocity(3.0, 3.0).x);
+  EXPECT_EQ(3.0f, testGrid.getVelocity(3.0, 3.0).y);
 
   // Test velocity at (-5.0, -5.0)
-  EXPECT_EQ(0.0f, testGrid.getVelocity(-5.0, -5.0)(0));
-  EXPECT_EQ(0.0f, testGrid.getVelocity(-5.0, -5.0)(1));
+  EXPECT_EQ(0.0f, testGrid.getVelocity(-5.0, -5.0).x);
+  EXPECT_EQ(0.0f, testGrid.getVelocity(-5.0, -5.0).y);
 
   // Test velocity at (100.0, 100.0)
-  EXPECT_EQ(3.0f, testGrid.getVelocity(100.0, 100.0)(0));
-  EXPECT_EQ(3.0f, testGrid.getVelocity(100.0, 100.0)(1));
+  EXPECT_EQ(3.0f, testGrid.getVelocity(100.0, 100.0).x);
+  EXPECT_EQ(3.0f, testGrid.getVelocity(100.0, 100.0).y);
 
   // Use edgeTestGrid to test velocity at (3.0, 1.25)
-  EXPECT_EQ(3.0f,   edgeTestGrid.getVelocity(3.0, 1.25)(0));
-  EXPECT_EQ(0.625f, edgeTestGrid.getVelocity(3.0, 1.25)(1));
+  EXPECT_EQ(3.0f,   edgeTestGrid.getVelocity(3.0, 1.25).x);
+  EXPECT_EQ(0.625f, edgeTestGrid.getVelocity(3.0, 1.25).y);
 
   // Use edgeTestGrid to test velocity at (3.0, 2.0)
-  EXPECT_EQ(3.0f, edgeTestGrid.getVelocity(3.0, 2.0)(0));
-  EXPECT_EQ(1.0f, edgeTestGrid.getVelocity(3.0, 2.0)(1));
+  EXPECT_EQ(3.0f, edgeTestGrid.getVelocity(3.0, 2.0).x);
+  EXPECT_EQ(1.0f, edgeTestGrid.getVelocity(3.0, 2.0).y);
 
   // Use edgeTestGrid to test velocity at (3.0, 3.0)
-  EXPECT_EQ(1.5f, edgeTestGrid.getVelocity(3.0, 3.0)(0));
-  EXPECT_EQ(1.5f, edgeTestGrid.getVelocity(3.0, 3.0)(1));
+  EXPECT_EQ(1.5f, edgeTestGrid.getVelocity(3.0, 3.0).x);
+  EXPECT_EQ(1.5f, edgeTestGrid.getVelocity(3.0, 3.0).y);
 }
 
 TEST_F(GridTest, GetMaxVelocity)
 {
   // Fetch maximum velocity from testGrid.
-  Vector<2,float> maxVel(2.5, 2.5);
+  Vector2 maxVel(2.5, 2.5);
   EXPECT_EQ(maxVel, testGrid.getMaxVelocity());
 }
 

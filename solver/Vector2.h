@@ -7,7 +7,7 @@
 class Vector2 {
 public:
   float x, y;
-  // Default Constructor
+  // Constructors
   Vector2();
   Vector2(float nx, float ny);
 
@@ -30,8 +30,7 @@ public:
   Vector2& operator-=(const Vector2 &rhs);
   Vector2& operator*=(const float &rhs);
   Vector2& operator/=(const float &rhs);
-  // TODO cross product; specialize template for 3D.
-  
+
   // Comparison operators
   bool operator==(const Vector2 &rhs) const;
   bool operator!=(const Vector2 &rhs) const;
