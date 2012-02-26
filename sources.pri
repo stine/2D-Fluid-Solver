@@ -20,6 +20,7 @@ INCLUDEPATH += $$BaseDirectory/ui \
 
 SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
            $$BaseDirectory/ui/QRendererWidget.cpp \
+           $$BaseDirectory/solver/Vector2.cpp \
            $$BaseDirectory/solver/FluidSolver.cpp \
            $$BaseDirectory/solver/Grid.cpp \
            $$BaseDirectory/solver/Cell.cpp \

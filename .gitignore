@@ -4,6 +4,7 @@
 *.o
 *.gch
 *.swp
+*.swo
 *.out
 *.app
 nocommit_*
