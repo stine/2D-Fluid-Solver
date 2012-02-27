@@ -88,12 +88,10 @@ public:
   // of this Grid class, where x = [0.0f, width), y = [0.0f, height)
   // 
   // Arguments:
-  //   float x - The x coordinate within this cell to sample from.
-  //   float y - The y coordinate within this cell to sample from.
-  //
+  //   Vector2 position - The position to sample velocity at
   // Returns:
   //   Vector2 - The interpolated velocity at this point.
-  Vector2 getVelocity(float x, float y) const;
+  Vector2 getVelocity(Vector2 position) const;
 
   // Calculates the pressure gradient across this cell. 
   // 
@@ -175,20 +173,19 @@ private:
   void setCellLinkage();
 
   // Calculates a velocity component at the given world location in the MAC grid.
-  float bilerpVel(float x, float y, Cell::Dimension dim) const;
+  float bilerpVel(Vector2 position, Cell::Dimension dim) const;
 
   // Utility function to perform bilinear interpolation between four values.
   // 
   // Arguments:
-  //   float x - X coordinate of the desired value.  Domain [0.0, 1.0]
-  //   float y - Y coordinate of the desired value.  Domain [0.0, 1.0]
+  //   Vector2 position - Position to perform bilinear interpolation at
   //   float originVal - Value at (0, 0)
   //   float posXVal   - Value at (0, 1)
   //   float posYVal   - Value at (1, 0)
   //   float posXYVal  - Value at (1, 1)
   // Returns:
   //   float - Bilinearly interpolated value at the specified location.
-  inline float bilerp(float x, float y,
+  inline float bilerp(Vector2 position,
 		      float originVal, float posXVal,
 		      float posYVal, float posXYVal) const;
 };
@@ -244,14 +241,14 @@ unsigned Grid::getColCount() const
 }
 
 
-float Grid::bilerp(float x, float y,
+float Grid::bilerp(Vector2 pos,
 		   float originVal, float posXVal,
 		   float posYVal, float posXYVal) const 
 {
-  return (1-x) * (1-y) * originVal +
-         x     * (1-y) * posXVal +
-         (1-x) * y     * posYVal +
-         x     * y     * posXYVal;
+  return (1-pos.x) * (1-pos.y) * originVal +
+         pos.x     * (1-pos.y) * posXVal +
+         (1-pos.x) * pos.y     * posYVal +
+         pos.x     * pos.y     * posXYVal;
 }
 
 

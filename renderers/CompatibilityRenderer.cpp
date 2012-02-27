@@ -4,7 +4,7 @@
 // TODO - YUCK - This global variable is a temporary hack!!!
 #include "FluidSolver.h"
 extern FluidSolver *solver;
-
+using std::vector;
 
 QGLFormat CompatibilityRenderer::getFormat()
 {
@@ -24,6 +24,7 @@ void CompatibilityRenderer::initialize()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glShadeModel(GL_SMOOTH);
+  glPointSize(2.0f);
 
   // Set the clear color.
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -80,7 +81,8 @@ void CompatibilityRenderer::resize(int pixWidth, int pixHeight)
 }
 
 
-void CompatibilityRenderer::drawGrid(const Grid &grid)
+void CompatibilityRenderer::drawGrid(const Grid &grid, 
+                                     const vector<Vector2> &particles)
 {
   // Get grid dimensions.
   float height = grid.getRowCount();
@@ -97,7 +99,7 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
   glPushAttrib(GL_CURRENT_BIT);
 
   // Draw the vertical and horizontal grid lines.
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
   glBegin(GL_LINES);
   for (unsigned i = 0; i <= width; ++i) {
     glVertex2f(i, 0);
@@ -110,7 +112,7 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
   glEnd();
 
   // Color the cells gray if they currently contain liquid.
-  glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
+  glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
   glPushAttrib(GL_DEPTH_BUFFER_BIT);
   glDepthMask(GL_FALSE);
   for (unsigned y = 0; y < height; ++y) {
@@ -130,16 +132,16 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
   glPopAttrib();
 
   // Draw the MAC velocity vectors.
-  glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+  glColor4f(0.5f, 0.0f, 0.0f, 1.0f);
   for (unsigned y = 0; y < height; ++y) {
     for (unsigned x = 0; x < width; ++x) {
-      float xV = grid(x, y).vel[Cell::X];
+      float xV = grid(x, y).vel[Cell::X] * 0.5f;
       glBegin(GL_LINES);
       glVertex2f(x, y + 0.5f);
       glVertex2f(x + xV, y + 0.5f);
       glEnd();
 
-      float yV = grid(x, y).vel[Cell::Y];
+      float yV = grid(x, y).vel[Cell::Y] * 0.5f;
       glBegin(GL_LINES);
       glVertex2f(x + 0.5f, y);
       glVertex2f(x + 0.5f, y + yV);
@@ -151,7 +153,7 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
   glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
   for (float y = 0.5f; y < grid.getHeight(); y += 1.0f) {
     for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
-      Vector2 vec = grid.getVelocity(x, y);
+      Vector2 vec = grid.getVelocity(Vector2(x, y)) * 0.5;
       glBegin(GL_LINES);
       glVertex2f(x, y);
       glVertex2f(x + vec.x, y + vec.y);
@@ -159,6 +161,15 @@ void CompatibilityRenderer::drawGrid(const Grid &grid)
     }
   }
 
+  glColor4f(0.0f, 0.6f, 0.8f, 1.0f);
+  glBegin(GL_POINTS);
+  vector<Vector2>::const_iterator itr = particles.begin();
+  for(; itr != particles.end(); ++itr)
+  {
+    glVertex2f(itr->x, itr->y);
+  }
+  glEnd();
+       
   // Draw the pressure at the center of each cell.
   // TODO
 

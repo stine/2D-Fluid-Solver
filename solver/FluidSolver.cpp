@@ -5,13 +5,18 @@
 #include "IFluidRenderer.h"
 #include "Grid.h"
 #include "Cell.h"
+#include "Vector2.h"
 #include "SignalRelay.h"
+
+
+using std::vector;
 
 FluidSolver::FluidSolver(float width, float height)
   : _width(width),
     _height(height),
     _grid(_width, _height),
-    _frameReady(false)
+    _frameReady(false),
+    _particles()
 {
   // Provide default values to the grid.
   reset();
@@ -35,6 +40,9 @@ void FluidSolver::reset()
   // with a large default grid, all filled with fluid and arbitrary velocities.
   // Change this as needed during devlopment to quickly test stuff out, and
   // remove before final release!
+
+  // Delete existing particles
+  _particles.clear();
   
   // Initialize a velocity field for testing.
   // Note: values in this velocity field are arbitrarily chosen and may be
@@ -47,6 +55,11 @@ void FluidSolver::reset()
       grid(x,y).pressure = 1.0f;
       grid(x,y).vel[Cell::X] = sin(x * 45.215 + y * 88.15468) / 2; // arbitrary constants
       grid(x,y).vel[Cell::Y] = sin(x * 2.548 + y * 121.1215) / 2;  // arbitrary constants
+
+      // Initialize particle positions
+      for (unsigned i = 0; i < 4; i++)
+        for(unsigned j = 0; j < 4; j++) 
+        _particles.push_back(Vector2(x + 0.20f * (i + 1), y + 0.20f * (j + 1)));
   }
 
   // Set values accordingly.
@@ -90,7 +103,7 @@ void FluidSolver::advanceTimeStep(float timeStepSec)
 
   advectVelocity(timeStepSec);
   applyGlobalVelocity(gravity * timeStepSec);
-//  boundaryCollide();
+  boundaryCollide();
   pressureSolve();
   moveParticles(timeStepSec);
 }
@@ -102,31 +115,31 @@ void FluidSolver::advectVelocity(float timeStepSec)
     for( float y = 0.5; y < _grid.getHeight(); y += 1.0f) {
       Cell &cell = _grid(floor(x), floor(y));
       Vector2 position(x, y); 
-      position += _grid.getVelocity(x, y) * -timeStepSec;
+      position += _grid.getVelocity(position) * -timeStepSec;
       if (position.x < 0)
-        position.x = 0;
+        position.zeroX();
       if (position.y > _grid.getWidth())
         position.x = _grid.getWidth(); 
       if (position.y < 0)
-        position.y = 0;
+        position.zeroY();
       if (position.y > _grid.getHeight())
         position.y = _grid.getHeight();
-      cell.stagedVel[Cell::X] = _grid.getVelocity(position.x, position.y).x;
+      cell.stagedVel[Cell::X] = _grid.getVelocity(position).x;
     }
   for(float y = 0; y < _grid.getHeight(); y += 1.0f)
     for(float x = 0.5; x < _grid.getWidth(); x+= 1.0f) {
       Cell &cell = _grid(floor(x), floor(y));
       Vector2 position(x, y); 
-      position += _grid.getVelocity(x, y) * -timeStepSec;
+      position += _grid.getVelocity(position) * -timeStepSec;
       if (position.x < 0)
-        position.x = 0;
+        position.zeroX();
       if (position.y > _grid.getWidth())
-        position.x = _grid.getWidth(); 
+        position.x = _grid.getWidth();
       if (position.y < 0)
-        position.y = 0;
+        position.zeroY();
       if (position.y > _grid.getHeight())
         position.y = _grid.getHeight();
-      cell.stagedVel[Cell::Y] = _grid.getVelocity(position.x, position.y).y;
+      cell.stagedVel[Cell::Y] = _grid.getVelocity(position).y;
     }
   for(unsigned i = 0; i < _grid.getRowCount() * _grid.getColCount(); i++) {
     _grid[i].commitStagedVel();
@@ -181,7 +194,12 @@ void FluidSolver::boundaryCollide()
 
 void FluidSolver::moveParticles(float timeStepSec)
 {
-  // TODO
+  for (vector<Vector2>::iterator itr = _particles.begin();
+                                 itr != _particles.end();
+                                 ++itr)
+  {
+    *itr += _grid.getVelocity(*itr) * timeStepSec;
+  }
 }
 
 
@@ -189,7 +207,7 @@ void FluidSolver::draw(IFluidRenderer *renderer)
 {
   // If a new frame is ready for rendering, draw it.
   if (_frameReady) {
-    renderer->drawGrid(_grid);
+    renderer->drawGrid(_grid, _particles);
     _frameReady = false;
   }
   else {

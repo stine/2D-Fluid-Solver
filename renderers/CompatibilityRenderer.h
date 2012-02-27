@@ -2,6 +2,7 @@
 #define __COMPATIBILITY_RENDERER_H__
 
 #include <QGLWidget>
+#include <vector>
 #include "IFluidRenderer.h"
 #include "Grid.h"
 
@@ -53,16 +54,18 @@ public:
 
   // Renders the fluid simulation grid, the contents of each cell
   // (liquid, solid, or gas), and velocity vectors at the center of each
-  // cell.
+  // cell.  This also renders the particles representing the fluid.
   //
   // Should typically be called from the FluidSolver class.
   //
   // Arguments:
   //   Grid &grid - The grid object containing all simulation cell data.
+  //   vector<Vector2> &particles- The particles visually representing the fluid.
   //
   // Returns:
   //   None
-  virtual void drawGrid(const Grid &grid);
+  virtual void drawGrid(const Grid &grid, 
+                        const std::vector<Vector2> &particles);
 };
 
 #endif // __COMPATIBILITY_RENDERER_H__

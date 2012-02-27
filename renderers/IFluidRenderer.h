@@ -2,6 +2,7 @@
 #define __I_FLUID_RENDERER_H__
 
 #include <QGLWidget>
+#include <vector>
 #include "Grid.h"
 
 class IFluidRenderer
@@ -49,10 +50,12 @@ public:
   //
   // Arguments:
   //   Grid &grid - The grid object containing all simulation cell data.
+  //   vector<Vector2> &particles - The particles visually representing fluid.
   //
   // Returns:
   //   None
-  virtual void drawGrid(const Grid &grid) = 0;
+  virtual void drawGrid(const Grid &grid, 
+                        const std::vector<Vector2> &particles) = 0;
 };
 
 #endif // __FLUID_RENDERER_H__

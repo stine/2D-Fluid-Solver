@@ -4,6 +4,7 @@
 #include "Grid.h"
 #include "Vector2.h"
 #include "IFluidRenderer.h"
+#include <vector>
 
 
 class FluidSolver : public QObject
@@ -16,7 +17,7 @@ private:
   Grid            _grid;        // The 2D MAC Grid.
   Vector2 _maxVelocity; // The maximum velocity seen last timestep.
   bool            _frameReady;  // True if frame's calculations are complete.
-  // TODO vector<MarkerParticle>
+  std::vector<Vector2> _particles;
 
 public:
   // Constructs a 2D fluid simulation of the specified size.

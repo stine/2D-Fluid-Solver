@@ -1,5 +1,6 @@
 #include "Grid.h"
 #include "Cell.h"
+#include "Vector2.h"
 #include <vector>
 #include <cstddef>
 
@@ -48,14 +49,14 @@ Grid::~Grid()
 }
 
 
-Vector2 Grid::getVelocity(float x, float y) const
+Vector2 Grid::getVelocity(Vector2 position) const
 {
   // Since the X and Y components of velocity are stored at different locations
   // in world space, a bilinear interpolation must be performed per-component
   // to determine the velocity at any point in the MAC grid.
   Vector2 result;
-  result.x = bilerpVel(x, y, Cell::X);
-  result.y = bilerpVel(x, y, Cell::Y);
+  result.x = bilerpVel(position, Cell::X);
+  result.y = bilerpVel(position, Cell::Y);
   return result;
 }
 
@@ -69,7 +70,7 @@ Vector2 Grid::getMaxVelocity() const
   Vector2 maxVel;
   for (float y = 0.5f; y < getHeight(); ++y)
     for (float x = 0.5f; x < getWidth(); ++x) {
-      Vector2 vel = getVelocity(x, y);
+      Vector2 vel = getVelocity(Vector2(x, y));
       if (vel.magnitude() > maxVel.magnitude())
 	maxVel = vel;
     }
@@ -110,16 +111,16 @@ void Grid::setCellLinkage()
 }
 
 
-float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
+float Grid::bilerpVel(Vector2 position, Cell::Dimension dim) const
 {
   // Ensure that incoming x and y values are not greater than the
   // max grid width. Do this prior to the "shifting" step below,
   // since a clamped value will need to be adjusted for X or Y
   // MAC grid sampling.
-  if (x > getWidth())
-    x = getWidth();
-  if (y > getHeight())
-    y = getHeight();
+  if (position.x > getWidth())
+    position.x = getWidth();
+  if (position.y > getHeight())
+    position.y = getHeight();
 
   // In a MAC Grid, the X and Y velocities are offset from the centerpoint
   // of a MAC cell by half the cell width.  In other words, if the center
@@ -132,10 +133,10 @@ float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
   // See documentation on the MAC grid for a deeper explanation.
   switch(dim) {
     case Cell::X:
-      y -= 0.5;
+      position.y -= 0.5;
       break;
     case Cell::Y:
-      x -= 0.5;
+      position.x -= 0.5;
       break;
     default:
       break;
@@ -144,18 +145,17 @@ float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
   // Ensure the resulting X and Y value are not less than the minimal
   // grid index.  Do this after the "shifting" step above, since the
   // shifted result may be less than 0.0.
-  if (x < 0.0f)
-    x = 0.0f;
-  if (y < 0.0f)
-    y = 0.0f;
+  if (position.x < 0.0f)
+    position.zeroX();
+  if (position.y < 0.0f)
+    position.zeroY();
 
   // Determine the base and fractional cell index for interpolation.
   unsigned i, j;
-  float fi, fj;
-  i = floor(x);
-  j = floor(y);
-  fi = x - i;
-  fj = y - j;
+
+  i = floor(position.x);
+  j = floor(position.y);
+  position -= Vector2(i,j);
 
   // Get the base cell.
   Cell cell = (*this)(i,j);
@@ -180,5 +180,5 @@ float Grid::bilerpVel(float x, float y, Cell::Dimension dim) const
   }
 
   // Perform the bilinear interpolation.
-  return bilerp(fi, fj, thisVel, rightVel, topVel, topRightVel);
+  return bilerp(position, thisVel, rightVel, topVel, topRightVel);
 }
