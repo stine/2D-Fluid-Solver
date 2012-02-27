@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "Cell.h"
-#include "Vector.h"
+#include "Vector2.h"
 
 
 class Grid {
@@ -92,8 +92,8 @@ public:
   //   float y - The y coordinate within this cell to sample from.
   //
   // Returns:
-  //   Vector<2,float> - The interpolated velocity at this point.
-  Vector<2,float> getVelocity(float x, float y) const;
+  //   Vector2 - The interpolated velocity at this point.
+  Vector2 getVelocity(float x, float y) const;
 
   // Calculates the pressure gradient across this cell. 
   // 
@@ -102,8 +102,8 @@ public:
   //   unsigned y - The integer y coordinate of this cell within the grid.
   //
   // Returns:
-  //   Vector<2,float> - The pressure gradient across this cell.
-  Vector<2,float> getPressureGradient(unsigned x, unsigned y) const;
+  //   Vector2 - The pressure gradient across this cell.
+  Vector2 getPressureGradient(unsigned x, unsigned y) const;
 
   // Calculates the divergence of the velocity field within this cell.
   // 
@@ -123,8 +123,8 @@ public:
   //   None
   //
   // Returns:
-  //   Vector<2,float> - The maximum velocity since resetMaxVelocity().
-  Vector<2,float> getMaxVelocity() const;
+  //   Vector2 - The maximum velocity since resetMaxVelocity().
+  Vector2 getMaxVelocity() const;
 
   // Gets the simulation height supported by this grid, in world coordinates.
   //

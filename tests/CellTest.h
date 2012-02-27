@@ -8,9 +8,13 @@
 
 // Test fixture for the Cell test.
 class CellTest : public testing::Test {
-protected:
-  const Cell defaultCell;
-  Cell testCell;
+  public:
+    CellTest() : defaultCell(), testCell() {}
+
+  protected:
+    const Cell defaultCell;
+    Cell testCell;
+
 
   virtual void SetUp() {
     testCell.pressure = 5.0f;

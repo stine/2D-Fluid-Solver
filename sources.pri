@@ -21,6 +21,7 @@ INCLUDEPATH += $$BaseDirectory/ui \
 
 SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
            $$BaseDirectory/ui/QRendererWidget.cpp \
+           $$BaseDirectory/solver/Vector2.cpp \
            $$BaseDirectory/solver/FluidSolver.cpp \
            $$BaseDirectory/solver/Grid.cpp \
            $$BaseDirectory/solver/Cell.cpp \
@@ -29,7 +30,7 @@ SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
 
 HEADERS += $$BaseDirectory/ui/MainWindow.h \
            $$BaseDirectory/ui/QRendererWidget.h \
-           $$BaseDirectory/solver/Vector.h \
+           $$BaseDirectory/solver/Vector2.h \
            $$BaseDirectory/solver/Cell.h \
            $$BaseDirectory/solver/FluidSolver.h \
            $$BaseDirectory/solver/Grid.h \
