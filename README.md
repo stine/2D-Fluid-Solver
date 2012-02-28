@@ -2,10 +2,12 @@
 
 Here is an attempt at creating a Semi-Lagrangian fluid solver in two dimensions, implemented as suggested by [Robert Bridson](http://www.cs.ubc.ca/~rbridson/) in his book [Fluid Simulation for Computer Graphics](http://www.amazon.com/Fluid-Simulation-Robert-Bridson/dp/1568813260).
 
-This started as an exploratory effort between [Jason Burton](http://github.com/mightcouldb1) and [Matt Stine](http://github.com/stine), and the intent is for us to learn exactly how fluid simulations are made through building one from scratch.  Most of the focus is on simply understanding the data structures and algorithms employed; this is not yet an exercise in optimization.
+This started as an exploratory effort between [Jason Burton](http://github.com/mightcouldb1) and [Matt Stine](http://github.com/stine), and out intent is to learn exactly how fluid simulations are made by building one from scratch.  Our primary focus is on simply understanding the data structures and algorithms employed; this is not yet an exercise in optimization.
 
 
 ## Features
+
+![Fluid Solver](http://www.metastine.com/img/feb28.png)
 
 Implemented features include:
 
@@ -13,7 +15,8 @@ Implemented features include:
 - Bilinear interpolation of staggered MAC Grid velocities
 - Velocity advection via backward particle trace
 - Particle advection
-- A "compatibility" renderer for visualizing data
+- A "compatibility" renderer for visualizing data on older systems
+
 
 Work to do:
 
@@ -40,13 +43,13 @@ Once all dependencies are resolved, change to the top-level directory for the 2D
 
 #### Release
 
-Building for release will produce an optitmized binary and will automatically execute all unit tests at compile time.  The build system will fail to produce an executable if any of the unit tests do not succeed.  A "release" directory will be created and populated with the fluid solver executable.
+Building for release will produce an optimized binary and will automatically execute all unit tests at compile time.  The build system will fail to produce an executable if any of the unit tests do not succeed.  A "release" directory will be created and populated with the fluid solver executable.
 
     make release 
 
 #### Debug
 
-Building for debug will produce an unoptitmized binary with debugging symbols.  The unit tests will be compiled, but not executed, and the fluid solver executable will be produced upon successful compilation.  A "debug" directory will be created under the top-level directory.
+Building for debug will produce an unoptimized binary with debugging symbols.  The unit tests will be compiled, but not executed, and the fluid solver executable will be produced upon successful compilation.  A "debug" directory will be created under the top-level directory.
 
     make debug
 
