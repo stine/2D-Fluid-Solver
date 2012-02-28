@@ -104,6 +104,8 @@ public:
   Vector2 getPressureGradient(unsigned x, unsigned y) const;
 
   // Calculates the divergence of the velocity field within this cell.
+  // NOTE: x and y are expected to be range supplied at construction time
+  // of this Grid class, where x = [0.0f, width), y = [0.0f, height)
   // 
   // Arguments:
   //   unsigned x - The integer x coordinate of this cell within the grid.

@@ -61,6 +61,35 @@ Vector2 Grid::getVelocity(Vector2 position) const
 }
 
 
+float Grid::getVelocityDivergence(unsigned x, unsigned y) const
+{
+  // Get reference to the cell. Note that x and y are assumted to be valid.
+  Cell cell = (*this)(x,y);
+
+  // If all neighbors are present, get the velocity value from each.
+  float xDivergence;
+  float yDivergence;
+  if (cell.allNeighbors) {
+    xDivergence = cell.neighbors[Cell::POS_X]->vel[Cell::X] - cell.vel[Cell::X];
+    yDivergence = cell.neighbors[Cell::POS_Y]->vel[Cell::Y] - cell.vel[Cell::Y];
+  }
+  // Else, set missing neighbors to 0 velocity.
+  else {
+    // Get right/top neighbor's velocity, or set to 0.
+    float rightXVel = cell.neighbors[Cell::POS_X]
+      ? cell.neighbors[Cell::POS_X]->vel[Cell::X] : 0.0f;
+    float topYVel = cell.neighbors[Cell::POS_Y]
+      ? cell.neighbors[Cell::POS_Y]->vel[Cell::Y] : 0.0f;
+
+    // Calculate x and y divergence.
+    xDivergence = rightXVel - cell.vel[Cell::X];
+    yDivergence = topYVel - cell.vel[Cell::Y];
+  }
+  
+  return xDivergence + yDivergence;
+}
+
+
 Vector2 Grid::getMaxVelocity() const
 {
   // Iterate through all MAC cell centers, finding the maximum velocity.

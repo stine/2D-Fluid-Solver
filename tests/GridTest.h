@@ -222,7 +222,10 @@ TEST_F(GridTest, GetPressureGradient)
 
 TEST_F(GridTest, GetVelocityDivergence)
 {
-  // TODO, pass test by default.
+  EXPECT_EQ( 2.0f, testGrid.getVelocityDivergence(0, 0));
+  EXPECT_EQ( 2.0f, testGrid.getVelocityDivergence(1, 0));
+  EXPECT_EQ(-2.0f, testGrid.getVelocityDivergence(3, 1));
+  EXPECT_EQ(-6.0f, testGrid.getVelocityDivergence(3, 3));
 }
 
 #endif // __GRID_TEST__
