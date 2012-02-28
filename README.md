@@ -8,18 +8,20 @@ This started as an exploratory effort between [Jason Burton](http://github.com/m
 ## Features
 
 Implemented features include:
-* Marker-and-Cell Grid data structures
-* Bilinear interpolation of staggered MAC Grid velocities
-* Velocity advection via backward particle trace
-* Particle advection
-* A "compatibility" renderer for visualizing data
+
+- Marker-and-Cell Grid data structures
+- Bilinear interpolation of staggered MAC Grid velocities
+- Velocity advection via backward particle trace
+- Particle advection
+- A "compatibility" renderer for visualizing data
 
 Work to do:
-* Good-looking renderer for OpenGL Core profiles
-* Boundary condition enforcement
-* Pressure solve (incompressibility requirement)
-* Improved UI with a better layout and more user controls
-* Encapsulate advection, pressure solve, and Cell references in the Grid class
+
+- Good-looking renderer for OpenGL Core profiles
+- Boundary condition enforcement
+- Pressure solve (incompressibility requirement)
+- Improved UI with a better layout and more user controls
+- Encapsulate advection, pressure solve, and Cell references in the Grid class
 
 
 ## Compilation
@@ -34,17 +36,17 @@ We also use the Google Test framework in this project.  Again, Linux users can t
 
 Once all dependencies are resolved, change to the top-level directory for the 2D fluid solver project.  Running QMake in this directory will generate the necessary Makefiles.
 
-   qmake-qt4
+    qmake-qt4
 
 #### Release
 
 Building for release will produce an optitmized binary and will automatically execute all unit tests at compile time.  The build system will fail to produce an executable if any of the unit tests do not succeed.  A "release" directory will be created and populated with the fluid solver executable.
 
-   make release 
+    make release 
 
 #### Debug
 
 Building for debug will produce an unoptitmized binary with debugging symbols.  The unit tests will be compiled, but not executed, and the fluid solver executable will be produced upon successful compilation.  A "debug" directory will be created under the top-level directory.
 
-   make debug
+    make debug
 
