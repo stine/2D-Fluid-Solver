@@ -5,16 +5,23 @@
 #include <vector>
 #include "IFluidRenderer.h"
 #include "Grid.h"
+#include "GL3/gl3.h"
 
 
 class FancyRenderer : public IFluidRenderer
 {
+private:
+  GLuint   macGridBuffer;
+
 public:
+  // Constructor
+  FancyRenderer();
+
   // Destructor
   //
   // Arguments:
   //   None
-  virtual ~FancyRenderer() {}
+  virtual ~FancyRenderer();
 
   // Provides the required OpenGL context arguments for this renderer.
   // 
@@ -66,6 +73,20 @@ public:
   //   None
   virtual void drawGrid(const Grid &grid, 
                         const std::vector<Vector2> &particles);
+
+protected:
+  // Creates a vertex buffer object representing the MAC grid lines.
+  //
+  // Arguments:
+  //   float cellWidth - The width of a single MAC cell.
+  //   unsigned cellXCount - The number of cells in the sim; X dimension.
+  //   unsigned cellYCount - The number of cells in the sim; Y dimension.
+  //
+  // Returns:
+  //   GLuint - The handle to the generated buffer object.
+  GLuint genMacGridBuffer(float cellWidth,
+			  unsigned cellXCount,
+			  unsigned cellYCount);
 };
 
-#endif // __COMPATIBILITY_RENDERER_H__
+#endif // __FANCY_RENDERER_H__

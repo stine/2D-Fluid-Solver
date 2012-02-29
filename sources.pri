@@ -14,9 +14,12 @@ Debug:MOC_DIR     = $$BaseDirectory/debug/.moc
 Debug:RCC_DIR     = $$BaseDirectory/debug/.rcc
 Debug:UI_DIR      = $$BaseDirectory/debug/.ui
 
+DEFINES += GL3_PROTOTYPES
+
 INCLUDEPATH += $$BaseDirectory/ui \
                $$BaseDirectory/solver \
                $$BaseDirectory/renderers \
+               $$BaseDirectory/renderers/glm \
 	       $$BaseDirectory/infrastructure \
 
 SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
@@ -25,6 +28,7 @@ SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
            $$BaseDirectory/solver/FluidSolver.cpp \
            $$BaseDirectory/solver/Grid.cpp \
            $$BaseDirectory/solver/Cell.cpp \
+           $$BaseDirectory/renderers/IFluidRenderer.cpp \
            $$BaseDirectory/renderers/CompatibilityRenderer.cpp \
            $$BaseDirectory/renderers/FancyRenderer.cpp \
 	   $$BaseDirectory/renderers/bstrlib.c \

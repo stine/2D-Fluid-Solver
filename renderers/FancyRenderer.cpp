@@ -1,9 +1,13 @@
+#include "GL3/gl3.h"
 #include "FancyRenderer.h"
 #include <cstdio>
+#include <vector>
+#include "glsw.h"
 
 // TODO - YUCK - This global variable is a temporary hack!!!
 #include "FluidSolver.h"
 extern FluidSolver *solver;
+
 using std::vector;
 
 QGLFormat FancyRenderer::getFormat()
@@ -16,20 +20,28 @@ QGLFormat FancyRenderer::getFormat()
 }
 
 
+FancyRenderer::FancyRenderer()
+  : macGridBuffer(0)
+{}
+
+
+FancyRenderer::~FancyRenderer()
+{
+  glDeleteBuffers(1, &macGridBuffer);
+}
+
 void FancyRenderer::initialize()
 {
-  // Old-fashioned OpenGL here. Rewrite for CORE profile.
+  // Some basic setup.
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glShadeModel(GL_SMOOTH);
   glPointSize(2.0f);
-
-  // Set the clear color.
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-  // Setup scene orientation.
+  // Compile shaders.
+  
+
+
+  // TODO Setup scene orientation.
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslatef(0.0f, 0.0f, -10.0f);
@@ -72,7 +84,7 @@ void FancyRenderer::resize(int pixWidth, int pixHeight)
     xMax = xMin + simWidth;
   }
   
-  // Define projection matrix based on widget size.
+  // TODO: Define projection matrix based on widget size.
   glPushAttrib(GL_MATRIX_MODE);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -82,7 +94,7 @@ void FancyRenderer::resize(int pixWidth, int pixHeight)
 
 
 void FancyRenderer::drawGrid(const Grid &grid, 
-                                     const vector<Vector2> &particles)
+			     const vector<Vector2> &particles)
 {
   // Get grid dimensions.
   float height = grid.getRowCount();
@@ -91,14 +103,14 @@ void FancyRenderer::drawGrid(const Grid &grid,
   // Clear the existing framebuffer contents.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // Push the current modelview matrix onto the stack.
+  // TODO: Push the current modelview matrix onto the stack.
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
 
-  // Store previous OpenGL state.
+  // TODO: Store previous OpenGL state.
   glPushAttrib(GL_CURRENT_BIT);
 
-  // Draw the vertical and horizontal grid lines.
+  // TODO: Draw the vertical and horizontal grid lines.
   glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
   glBegin(GL_LINES);
   for (unsigned i = 0; i <= width; ++i) {

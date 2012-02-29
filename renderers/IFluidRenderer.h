@@ -1,7 +1,8 @@
 #ifndef __I_FLUID_RENDERER_H__
 #define __I_FLUID_RENDERER_H__
 
-#include <QGLWidget>
+#include "GL3/gl3.h"
+#include <QGLFormat>
 #include <vector>
 #include "Grid.h"
 
@@ -56,6 +57,13 @@ public:
   //   None
   virtual void drawGrid(const Grid &grid, 
                         const std::vector<Vector2> &particles) = 0;
+
+protected:
+  // TODO documentation
+  GLuint shaderObj(GLenum shaderType, const char *shaderText);
+
+  // TODO documentation  
+  GLuint shaderProgram(const std::vector<GLuint> &shaderList);
 };
 
 #endif // __FLUID_RENDERER_H__

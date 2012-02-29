@@ -1,0 +1,3 @@
+[submodule "renderers/glm"]
+	path = renderers/glm
+	url = git://github.com/stine/glm.git
