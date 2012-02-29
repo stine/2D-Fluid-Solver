@@ -12,7 +12,7 @@ MainWindow::MainWindow()
 {
   // Establish a default renderer to use.
   _rendWidget = QRendererWidget::rendererWidget
-    (this, QRendererWidget::COMPATIBILITY_RENDERER);
+    (this, QRendererWidget::FANCY_RENDERER);
 
   // Create the overall window layout - an HBoxLayout.
   _mainLayout = new QHBoxLayout;

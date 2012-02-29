@@ -1,5 +1,6 @@
 #include "QRendererWidget.h"
 #include "CompatibilityRenderer.h"
+#include "FancyRenderer.h"
 
 // TODO - YUCK - This global variable is a temporary hack!!!
 #include "FluidSolver.h"
@@ -17,6 +18,9 @@ QRendererWidget * QRendererWidget::rendererWidget(QWidget *parent,
   switch (renderer) {
   case COMPATIBILITY_RENDERER:
     rendPtr = new CompatibilityRenderer();
+    break;
+  case FANCY_RENDERER:
+    rendPtr = new FancyRenderer();
     break;
   default:
     // Shouldn't get here...

@@ -14,6 +14,7 @@ public:
   // Enumerated type listing all implemented renderers to choose from.
   enum Renderers {
     COMPATIBILITY_RENDERER = 0,
+    FANCY_RENDERER,
     RENDERER_COUNT
   };
   
