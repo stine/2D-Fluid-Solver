@@ -26,6 +26,8 @@ SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
            $$BaseDirectory/solver/Grid.cpp \
            $$BaseDirectory/solver/Cell.cpp \
            $$BaseDirectory/renderers/CompatibilityRenderer.cpp \
+	   $$BaseDirectory/renderers/bstrlib.c \
+	   $$BaseDirectory/renderers/glsw.c \
 	   $$BaseDirectory/infrastructure/SignalRelay.cpp
 
 HEADERS += $$BaseDirectory/ui/MainWindow.h \
@@ -34,6 +36,8 @@ HEADERS += $$BaseDirectory/ui/MainWindow.h \
            $$BaseDirectory/solver/Cell.h \
            $$BaseDirectory/solver/FluidSolver.h \
            $$BaseDirectory/solver/Grid.h \
+	   $$BaseDirectory/renderers/bstrlib.h \
+	   $$BaseDirectory/renderers/glsw.h \
            $$BaseDirectory/renderers/IFluidRenderer.h \
            $$BaseDirectory/renderers/CompatibilityRenderer.h \
 	   $$BaseDirectory/infrastructure/SignalRelay.h
