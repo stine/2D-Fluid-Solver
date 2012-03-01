@@ -2,6 +2,8 @@
 #include "FancyRenderer.h"
 #include <cstdio>
 #include <vector>
+#include <string>
+#include <cstdio>
 #include "glsw.h"
 
 // TODO - YUCK - This global variable is a temporary hack!!!
@@ -9,6 +11,7 @@
 extern FluidSolver *solver;
 
 using std::vector;
+using std::string;
 
 QGLFormat FancyRenderer::getFormat()
 {
@@ -21,30 +24,74 @@ QGLFormat FancyRenderer::getFormat()
 
 
 FancyRenderer::FancyRenderer()
-  : macGridBuffer(0)
-{}
+  : _macGridBuffer(0),
+    _gridProgram(0),
+    _cellProgram(0),
+    _vectorProgram(0),
+    _particleProgram(0),
+    _mvMatrix(1.0f),
+    _mvpMatrix(1.0f)
+{
+}
 
 
 FancyRenderer::~FancyRenderer()
 {
-  glDeleteBuffers(1, &macGridBuffer);
+  glDeleteBuffers(1, &_macGridBuffer);
 }
+
+
+GLuint FancyRenderer::initShader(string effectName)
+{
+  GLuint program;
+  string shaderString;
+  vector<GLuint> objects;
+
+  glswInit();
+  
+  // Load shader program text.
+  glswSetPath("./", ".glsl");
+  const char *vs = glswGetShader((effectName + ".Vertex").c_str());
+  if (!vs) {
+    fprintf(stderr, "%s\n", glswGetError());
+    glswShutdown();
+    return 0;
+  }
+  const char *fs = glswGetShader((effectName + ".Fragment").c_str());
+  if (!fs) {
+    fprintf(stderr, "%s\n", glswGetError());
+    glswShutdown();
+    return 0;
+  }
+
+  // Compile shader programs.
+  objects.push_back(shaderObj(GL_VERTEX_SHADER, vs));
+  objects.push_back(shaderObj(GL_FRAGMENT_SHADER, fs));
+
+  // Link shader program.
+  program = shaderProgram(objects);
+
+  glswShutdown();
+
+  return program;
+}
+
 
 void FancyRenderer::initialize()
 {
-  // Some basic setup.
+  // Basic OpenGL setup.
   glEnable(GL_DEPTH_TEST);
   glPointSize(2.0f);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-  // Compile shaders.
-  
+  // Load all shader programs.
+  _gridProgram = initShader("Grid");
+  _cellProgram = initShader("Cells");
+  _vectorProgram = initShader("Vectors");
+  _particleProgram = initShader("Particles");
 
-
-  // TODO Setup scene orientation.
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glTranslatef(0.0f, 0.0f, -10.0f);
+  // Set default modelview matrix.
+  _mvMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -10));
 }
 
 
@@ -84,12 +131,8 @@ void FancyRenderer::resize(int pixWidth, int pixHeight)
     xMax = xMin + simWidth;
   }
   
-  // TODO: Define projection matrix based on widget size.
-  glPushAttrib(GL_MATRIX_MODE);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(xMin, xMax, yMin, yMax, 5.0, 15.0);
-  glPopAttrib();
+  // Define projection  matrix based on widget size.  Multiply by modelview matrix.
+  _mvpMatrix = glm::ortho(xMin, xMax, yMin, yMax, 5.0f, 15.0f) * _mvMatrix;
 }
 
 
@@ -103,15 +146,13 @@ void FancyRenderer::drawGrid(const Grid &grid,
   // Clear the existing framebuffer contents.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // TODO: Push the current modelview matrix onto the stack.
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-
-  // TODO: Store previous OpenGL state.
-  glPushAttrib(GL_CURRENT_BIT);
 
   // TODO: Draw the vertical and horizontal grid lines.
-  glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
+  float gridColor[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+  glUniform4fv(glGetUniformLocation(_gridProgram, "color"), 1, gridColor);
+  glUniformMatrix4fv(glGetUniformLocation(_gridProgram, "mvpMatrix"),
+		     1, false, &_mvpMatrix[0][0]);
+  glBindFragDataLocation(_gridProgram, 0, "fragcolor");
   glBegin(GL_LINES);
   for (unsigned i = 0; i <= width; ++i) {
     glVertex2f(i, 0);
@@ -125,7 +166,6 @@ void FancyRenderer::drawGrid(const Grid &grid,
 
   // Color the cells gray if they currently contain liquid.
   glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
-  glPushAttrib(GL_DEPTH_BUFFER_BIT);
   glDepthMask(GL_FALSE);
   for (unsigned y = 0; y < height; ++y) {
     for (unsigned x = 0; x < width; ++x) {
@@ -141,25 +181,6 @@ void FancyRenderer::drawGrid(const Grid &grid,
       }
     }
   }
-  glPopAttrib();
-
-  // Draw the MAC velocity vectors.
-  glColor4f(0.5f, 0.0f, 0.0f, 1.0f);
-  for (unsigned y = 0; y < height; ++y) {
-    for (unsigned x = 0; x < width; ++x) {
-      float xV = grid(x, y).vel[Cell::X] * 0.5f;
-      glBegin(GL_LINES);
-      glVertex2f(x, y + 0.5f);
-      glVertex2f(x + xV, y + 0.5f);
-      glEnd();
-
-      float yV = grid(x, y).vel[Cell::Y] * 0.5f;
-      glBegin(GL_LINES);
-      glVertex2f(x + 0.5f, y);
-      glVertex2f(x + 0.5f, y + yV);
-      glEnd();
-    }
-  }
 
   // Draw the velocity vector at the center of each cell.
   glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
@@ -173,6 +194,7 @@ void FancyRenderer::drawGrid(const Grid &grid,
     }
   }
 
+  // Draw the points.
   glColor4f(0.0f, 0.6f, 0.8f, 1.0f);
   glBegin(GL_POINTS);
   vector<Vector2>::const_iterator itr = particles.begin();
@@ -181,13 +203,4 @@ void FancyRenderer::drawGrid(const Grid &grid,
     glVertex2f(itr->x, itr->y);
   }
   glEnd();
-       
-  // Draw the pressure at the center of each cell.
-  // TODO
-
-  // Restore previous OpenGL state.
-  glPopAttrib();
-
-  // Restore the previous modelview matrix.
-  glPopMatrix();
 }

@@ -41,7 +41,7 @@ HEADERS += $$BaseDirectory/ui/MainWindow.h \
            $$BaseDirectory/solver/Cell.h \
            $$BaseDirectory/solver/FluidSolver.h \
            $$BaseDirectory/solver/Grid.h \
-           $$BaseDirectory/renderers/gl3.h \
+           $$BaseDirectory/renderers/GL3/gl3.h \
 	   $$BaseDirectory/renderers/bstrlib.h \
 	   $$BaseDirectory/renderers/glsw.h \
            $$BaseDirectory/renderers/IFluidRenderer.h \
