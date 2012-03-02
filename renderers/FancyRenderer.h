@@ -17,14 +17,18 @@
 class FancyRenderer : public IFluidRenderer
 {
 private:
+  // Buffer objects
   GLuint    _macGridBuffer;
+  
+  // Shader programs
   Shader    _gridProgram;
   Shader    _cellProgram;
   Shader    _vectorProgram;
   Shader    _particleProgram;  
+  
+  // Matrices
   glm::mat4 _mvMatrix;
   glm::mat4 _mvpMatrix;  // Projection * ModelView matrix
-  float     _gridColor[4];
 
 public:
   // Constructor

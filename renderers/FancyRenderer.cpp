@@ -40,15 +40,29 @@ FancyRenderer::~FancyRenderer()
 void FancyRenderer::initialize()
 {
   // Basic OpenGL setup.
+  glEnable(GL_BLEND);
+  glBlendEquation(GL_FUNC_ADD);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_DEPTH_TEST);
   glPointSize(2.0f);
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-  // Load all shader programs.
+  // Load all shader programs and bind attribute locations.
   _gridProgram.compile("Grid.Vertex", NULL, "Grid.Fragment");
+  glBindAttribLocation(_gridProgram, 0, "position");
+  glBindFragDataLocation(_gridProgram, 0, "fragcolor");
+
   _cellProgram.compile("Cells.Vertex", NULL, "Cells.Fragment");
-  _vectorProgram.compile("Vectors.Vertex", "Vectors.Geometry", "Vectors.Fragment");
+  glBindAttribLocation(_cellProgram, 0, "position");
+  glBindFragDataLocation(_cellProgram, 0, "fragcolor");
+
+  _vectorProgram.compile("Vectors.Vertex", NULL, "Vectors.Fragment");
+  glBindAttribLocation(_vectorProgram, 0, "position");
+  glBindFragDataLocation(_vectorProgram, 0, "fragcolor");
+
   _particleProgram.compile("Particles.Vertex", NULL, "Particles.Fragment");
+  glBindAttribLocation(_particleProgram, 0, "position");
+  glBindFragDataLocation(_particleProgram, 0, "fragcolor");
 
   // Set default modelview matrix.
   _mvMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -10));
@@ -110,15 +124,20 @@ void FancyRenderer::endFrame()
 void FancyRenderer::drawGrid(const Grid &grid)
 {
   // Get grid dimensions.
-  float height = grid.getRowCount();
-  float width  = grid.getColCount();
+  float height = grid.getRowCount() - 1;
+  float width  = grid.getColCount() - 1;
 
-  // TODO: Draw the vertical and horizontal grid lines.
-  float gridColor[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+  // Select shader program.
+  glUseProgram(_gridProgram);
+  
+  // Load uniforms.
+  float gridColor[4] = {0.2f, 0.2f, 0.2f, 1.0f};
+  glUniform4fv(glGetUniformLocation(_gridProgram, "color"), 1, gridColor);
   glUniformMatrix4fv(glGetUniformLocation(_gridProgram, "mvpMatrix"),
 		     1, false, &_mvpMatrix[0][0]);
-  glUniform4fv(glGetUniformLocation(_gridProgram, "color"), 1, gridColor);
-  glBindFragDataLocation(_gridProgram, 0, "fragcolor");
+
+  // Draw the vertical and horizontal grid lines.
+  // TODO, use buffer objects.
   glBegin(GL_LINES);
   for (unsigned i = 0; i <= width; ++i) {
     glVertex2f(i, 0);
@@ -134,17 +153,81 @@ void FancyRenderer::drawGrid(const Grid &grid)
 
 void FancyRenderer::drawCells(const Grid &grid)
 {
+  // Get grid dimensions.
+  float height = grid.getRowCount();
+  float width  = grid.getColCount();
+  
+  // Select shader program.
+  glUseProgram(_cellProgram);
 
+  // Load uniforms.
+  //TODO: {1.0f, 1.0f, 1.0f, 0.1f};
+  float cellColor[4] = {0.1f, 0.1f, 0.1f, 1.0f};  
+  glUniform4fv(glGetUniformLocation(_cellProgram, "color"), 1, cellColor);
+  glUniformMatrix4fv(glGetUniformLocation(_cellProgram, "mvpMatrix"),
+		     1, false, &_mvpMatrix[0][0]);
+
+  // Draw the MAC grid cells if they contain fluid.
+  glDepthMask(GL_FALSE);
+  for (unsigned y = 0; y < height; ++y) {
+    for (unsigned x = 0; x < width; ++x) {
+      if (grid(x, y).cellType == Cell::FLUID) {
+	glBegin(GL_TRIANGLES);
+	glVertex2f(x, y);
+	glVertex2f(x+1, y);
+	glVertex2f(x+1, y+1);
+	glVertex2f(x+1, y+1);
+	glVertex2f(x, y+1);
+	glVertex2f(x, y);
+	glEnd();
+      }
+    }
+  }
+  glDepthMask(GL_TRUE);
 }
 
 
 void FancyRenderer::drawVectors(const Grid &grid)
 {
+  // Select shader program.
+  glUseProgram(_vectorProgram);
+  
+  // Load uniforms.
+  float vecColor[4] = {1.0f, 1.0f, 0.0f, 1.0f};
+  glUniform4fv(glGetUniformLocation(_vectorProgram, "color"), 1, vecColor);
+  glUniformMatrix4fv(glGetUniformLocation(_vectorProgram, "mvpMatrix"),
+		     1, false, &_mvpMatrix[0][0]);
 
+  // Draw the velocity vector at the center of each cell.
+  for (float y = 0.5f; y < grid.getHeight(); y += 1.0f) {
+    for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
+      Vector2 vec = grid.getVelocity(Vector2(x, y)) * 0.5;
+      glBegin(GL_LINES);
+      glVertex2f(x, y);
+      glVertex2f(x + vec.x, y + vec.y);
+      glEnd();
+    }
+  }
 }
 
 
 void FancyRenderer::drawParticles(const std::vector<Vector2> &particles)
 {
+  // Select shader program.
+  glUseProgram(_particleProgram);
 
+  // Load uniforms.
+  float vecColor[4] = {0.0f, 0.6f, 0.8f, 1.0f};
+  glUniform4fv(glGetUniformLocation(_vectorProgram, "color"), 1, vecColor);
+  glUniformMatrix4fv(glGetUniformLocation(_vectorProgram, "mvpMatrix"),
+		     1, false, &_mvpMatrix[0][0]);
+  
+  // Draw the fluid particles.
+  glBegin(GL_POINTS);
+  vector<Vector2>::const_iterator itr = particles.begin();
+  for(; itr != particles.end(); ++itr)
+  {
+    glVertex2f(itr->x, itr->y);
+  }
+  glEnd();
 }

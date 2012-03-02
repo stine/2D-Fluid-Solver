@@ -1,20 +1,24 @@
 -- Vertex
 
+#version 130
 uniform mat4 mvpMatrix;
-
 in vec3 position;
-
 void main() {
   // Transform position by modelview and projection matrices.
   gl_Position = mvpMatrix * vec4(position, 1.0);
 } 
 
+
+-- Geometry
+
+#version 130
+
+
 -- Fragment
 
+#version 130
 uniform vec4 color;
-
 out vec4 fragcolor;
-
 void main() {
-  fragcolor = vec4(1.0);
+  fragcolor = color;
 }
