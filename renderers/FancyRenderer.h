@@ -71,23 +71,51 @@ public:
   //   None
   virtual void resize(int pixWidth, int pixHeight);
 
-  // Renders the fluid simulation grid, the contents of each cell
-  // (liquid, solid, or gas), and velocity vectors at the center of each
-  // cell.  This also renders the particles representing the fluid.
-  //
-  // Should typically be called from the FluidSolver class.
+  // TODO document
+  virtual void beginFrame();
+
+  // TODO document
+  virtual void endFrame();
+
+  // Renders the outlines of the MAC grid's cells.
   //
   // Arguments:
   //   Grid &grid - The grid object containing all simulation cell data.
-  //   vector<Vector2> &particles- The particles visually representing the fluid.
   //
   // Returns:
   //   None
-  virtual void drawGrid(const Grid &grid, 
-                        const std::vector<Vector2> &particles);
+  virtual void drawGrid(const Grid &grid);
+
+  // Renders the filled area of the MAC grid's cells.
+  //
+  // Arguments:
+  //   Grid &grid - The grid object containing all simulation cell data.
+  //
+  // Returns:
+  //   None
+  virtual void drawCells(const Grid &grid);
+
+  // Renders the velocity vectors showing fluid flow.
+  //
+  // Arguments:
+  //   Grid &grid - The grid object containing all simulation cell data.
+  //
+  // Returns:
+  //   None
+  virtual void drawVectors(const Grid &grid);
+
+  // Renders the fluid simulation's particles.
+  //
+  // Arguments:
+  //   vector<Vector2> &particles - The particles visually representing fluid.
+  //
+  // Returns:
+  //   None
+  virtual void drawParticles(const std::vector<Vector2> &particles);
 
 protected:
-  // Creates a vertex buffer object representing the MAC grid lines.
+  // Creates a VBO
+  // TODO documentation
   //
   // Arguments:
   //   float cellWidth - The width of a single MAC cell.
@@ -100,7 +128,8 @@ protected:
 			  unsigned cellXCount,
 			  unsigned cellYCount);
 
-  // Creates a vertex buffer object representing the MAC grid cells.
+  // Creates a VBO
+  // TODO documentation
   //
   // Arguments:
   //   float cellWidth - The width of a single MAC cell.

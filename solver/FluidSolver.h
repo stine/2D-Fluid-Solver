@@ -15,8 +15,8 @@ private:
   const float     _width;       // The width of the simulation.
   const float     _height;      // The height of the simulation.
   Grid            _grid;        // The 2D MAC Grid.
-  Vector2 _maxVelocity; // The maximum velocity seen last timestep.
-  bool            _frameReady;  // True if frame's calculations are complete.
+  Vector2         _maxVelocity; // The maximum velocity seen last timestep.
+  bool            _frameCalculated;  // True if frame's calculations are complete.
   std::vector<Vector2> _particles;
 
 public:

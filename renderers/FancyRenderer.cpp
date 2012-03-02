@@ -136,22 +136,28 @@ void FancyRenderer::resize(int pixWidth, int pixHeight)
 }
 
 
-void FancyRenderer::drawGrid(const Grid &grid, 
-			     const vector<Vector2> &particles)
+void FancyRenderer::beginFrame()
+{
+  // Clear the existing framebuffer contents.
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+
+void FancyRenderer::endFrame()
+{}
+
+
+void FancyRenderer::drawGrid(const Grid &grid)
 {
   // Get grid dimensions.
   float height = grid.getRowCount();
   float width  = grid.getColCount();
 
-  // Clear the existing framebuffer contents.
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
   // TODO: Draw the vertical and horizontal grid lines.
   float gridColor[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-  glUniform4fv(glGetUniformLocation(_gridProgram, "color"), 1, gridColor);
   glUniformMatrix4fv(glGetUniformLocation(_gridProgram, "mvpMatrix"),
 		     1, false, &_mvpMatrix[0][0]);
+  glUniform4fv(glGetUniformLocation(_gridProgram, "color"), 1, gridColor);
   glBindFragDataLocation(_gridProgram, 0, "fragcolor");
   glBegin(GL_LINES);
   for (unsigned i = 0; i <= width; ++i) {
@@ -163,44 +169,22 @@ void FancyRenderer::drawGrid(const Grid &grid,
     glVertex2f(width, i);
   }
   glEnd();
+}
 
-  // Color the cells gray if they currently contain liquid.
-  glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
-  glDepthMask(GL_FALSE);
-  for (unsigned y = 0; y < height; ++y) {
-    for (unsigned x = 0; x < width; ++x) {
-      if (grid(x, y).cellType == Cell::FLUID) {
-	glBegin(GL_TRIANGLES);
-	glVertex2f(x, y);
-	glVertex2f(x+1, y);
-	glVertex2f(x+1, y+1);
-	glVertex2f(x+1, y+1);
-	glVertex2f(x, y+1);
-	glVertex2f(x, y);
-	glEnd();
-      }
-    }
-  }
 
-  // Draw the velocity vector at the center of each cell.
-  glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-  for (float y = 0.5f; y < grid.getHeight(); y += 1.0f) {
-    for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
-      Vector2 vec = grid.getVelocity(Vector2(x, y)) * 0.5;
-      glBegin(GL_LINES);
-      glVertex2f(x, y);
-      glVertex2f(x + vec.x, y + vec.y);
-      glEnd();
-    }
-  }
+void FancyRenderer::drawCells(const Grid &grid)
+{
 
-  // Draw the points.
-  glColor4f(0.0f, 0.6f, 0.8f, 1.0f);
-  glBegin(GL_POINTS);
-  vector<Vector2>::const_iterator itr = particles.begin();
-  for(; itr != particles.end(); ++itr)
-  {
-    glVertex2f(itr->x, itr->y);
-  }
-  glEnd();
+}
+
+
+void FancyRenderer::drawVectors(const Grid &grid)
+{
+
+}
+
+
+void FancyRenderer::drawParticles(const std::vector<Vector2> &particles)
+{
+
 }

@@ -81,25 +81,33 @@ void CompatibilityRenderer::resize(int pixWidth, int pixHeight)
 }
 
 
-void CompatibilityRenderer::drawGrid(const Grid &grid, 
-                                     const vector<Vector2> &particles)
+void CompatibilityRenderer::beginFrame()
+{
+  // Clear the existing framebuffer contents.
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // Store previous OpenGL state.
+  glPushAttrib(GL_CURRENT_BIT);
+}
+
+
+void CompatibilityRenderer::endFrame()
+{
+  // Pop OpenGL state.
+  glPopAttrib();
+}
+
+
+void CompatibilityRenderer::drawGrid(const Grid &grid)
 {
   // Get grid dimensions.
   float height = grid.getRowCount();
   float width  = grid.getColCount();
 
-  // Clear the existing framebuffer contents.
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // Push the current modelview matrix onto the stack.
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-
-  // Store previous OpenGL state.
-  glPushAttrib(GL_CURRENT_BIT);
-
-  // Draw the vertical and horizontal grid lines.
+  // Set the color for grid lines.
   glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
+
+  // Draw the grid lines.
   glBegin(GL_LINES);
   for (unsigned i = 0; i <= width; ++i) {
     glVertex2f(i, 0);
@@ -110,9 +118,19 @@ void CompatibilityRenderer::drawGrid(const Grid &grid,
     glVertex2f(width, i);
   }
   glEnd();
+}
 
-  // Color the cells gray if they currently contain liquid.
+
+void CompatibilityRenderer::drawCells(const Grid &grid)
+{
+  // Get grid dimensions.
+  float height = grid.getRowCount();
+  float width  = grid.getColCount();
+  
+  // Set the MAC grid cell color.
   glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
+
+  // Draw the MAC grid cells if they contain fluid.
   glPushAttrib(GL_DEPTH_BUFFER_BIT);
   glDepthMask(GL_FALSE);
   for (unsigned y = 0; y < height; ++y) {
@@ -130,9 +148,19 @@ void CompatibilityRenderer::drawGrid(const Grid &grid,
     }
   }
   glPopAttrib();
+}
 
-  // Draw the MAC velocity vectors.
+
+void CompatibilityRenderer::drawVectors(const Grid &grid)
+{
+  // Get grid dimensions.
+  float height = grid.getRowCount();
+  float width  = grid.getColCount();
+  
+  // Set the MAC face velocity vector color.
   glColor4f(0.5f, 0.0f, 0.0f, 1.0f);
+
+  // Draw the MAC face velocity vectors.
   for (unsigned y = 0; y < height; ++y) {
     for (unsigned x = 0; x < width; ++x) {
       float xV = grid(x, y).vel[Cell::X] * 0.5f;
@@ -149,8 +177,10 @@ void CompatibilityRenderer::drawGrid(const Grid &grid,
     }
   }
 
-  // Draw the velocity vector at the center of each cell.
+  // Set the velocity field vector color.
   glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+
+  // Draw the velocity vector at the center of each cell.
   for (float y = 0.5f; y < grid.getHeight(); y += 1.0f) {
     for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
       Vector2 vec = grid.getVelocity(Vector2(x, y)) * 0.5;
@@ -160,8 +190,15 @@ void CompatibilityRenderer::drawGrid(const Grid &grid,
       glEnd();
     }
   }
+}
 
+
+void CompatibilityRenderer::drawParticles(const std::vector<Vector2> &particles)
+{
+  // Set the color for the fluid particles.
   glColor4f(0.0f, 0.6f, 0.8f, 1.0f);
+  
+  // Draw the fluid particles.
   glBegin(GL_POINTS);
   vector<Vector2>::const_iterator itr = particles.begin();
   for(; itr != particles.end(); ++itr)
@@ -169,13 +206,4 @@ void CompatibilityRenderer::drawGrid(const Grid &grid,
     glVertex2f(itr->x, itr->y);
   }
   glEnd();
-       
-  // Draw the pressure at the center of each cell.
-  // TODO
-
-  // Restore previous OpenGL state.
-  glPopAttrib();
-
-  // Restore the previous modelview matrix.
-  glPopMatrix();
 }

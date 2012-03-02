@@ -47,16 +47,48 @@ public:
   //   None
   virtual void resize(int pixWidth, int pixHeight) = 0;
 
-  // Renders the fluid simulation grid.
+  // TODO document
+  virtual void beginFrame() = 0;
+
+  // TODO document
+  virtual void endFrame() = 0;
+
+  // Renders the outlines of the MAC grid's cells.
   //
   // Arguments:
   //   Grid &grid - The grid object containing all simulation cell data.
+  //
+  // Returns:
+  //   None
+  virtual void drawGrid(const Grid &grid) = 0;
+
+  // Renders the filled area of the MAC grid's cells.
+  //
+  // Arguments:
+  //   Grid &grid - The grid object containing all simulation cell data.
+  //
+  // Returns:
+  //   None
+  virtual void drawCells(const Grid &grid) = 0;
+
+  // Renders the velocity vectors showing fluid flow.
+  //
+  // Arguments:
+  //   Grid &grid - The grid object containing all simulation cell data.
+  //
+  // Returns:
+  //   None
+  virtual void drawVectors(const Grid &grid) = 0;
+
+  // Renders the fluid simulation's particles.
+  //
+  // Arguments:
   //   vector<Vector2> &particles - The particles visually representing fluid.
   //
   // Returns:
   //   None
-  virtual void drawGrid(const Grid &grid, 
-                        const std::vector<Vector2> &particles) = 0;
+  virtual void drawParticles(const std::vector<Vector2> &particles) = 0;
+
 
 protected:
   // TODO documentation

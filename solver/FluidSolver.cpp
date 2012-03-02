@@ -15,7 +15,7 @@ FluidSolver::FluidSolver(float width, float height)
   : _width(width),
     _height(height),
     _grid(_width, _height),
-    _frameReady(false),
+    _frameCalculated(false),
     _particles()
 {
   // Provide default values to the grid.
@@ -64,7 +64,7 @@ void FluidSolver::reset()
 
   // Set values accordingly.
   _grid = grid;
-  _frameReady = false;
+  _frameCalculated = false;
 }
 
 void FluidSolver::advanceFrame()
@@ -72,10 +72,10 @@ void FluidSolver::advanceFrame()
   float frameTimeSec = 1.0f/30.0f; // TODO Target 30 Hz framerate for now.
   float CFLCoefficient = 2.0f;     // TODO CFL coefficient set to 2 for now.
 
-  while (!_frameReady) {
+  while (!_frameCalculated) {
     // If enough simulation time has elapsed to draw the next frame, break.
     if (frameTimeSec <= 0.0f) {
-      _frameReady = true;
+      _frameCalculated = true;
       break;
     }
 
@@ -206,9 +206,14 @@ void FluidSolver::moveParticles(float timeStepSec)
 void FluidSolver::draw(IFluidRenderer *renderer)
 {
   // If a new frame is ready for rendering, draw it.
-  if (_frameReady) {
-    renderer->drawGrid(_grid, _particles);
-    _frameReady = false;
+  if (_frameCalculated) {
+    renderer->beginFrame();
+    renderer->drawGrid(_grid);
+    renderer->drawCells(_grid);
+    renderer->drawVectors(_grid);
+    renderer->drawParticles(_particles);
+    renderer->endFrame();
+    _frameCalculated = false;
   }
   else {
     // TODO, redraw previous frame.
