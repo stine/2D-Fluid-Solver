@@ -116,6 +116,8 @@ void FluidSolver::advectVelocity(float timeStepSec)
       Cell &cell = _grid(floor(x), floor(y));
       Vector2 position(x, y); 
       position += _grid.getVelocity(position) * -timeStepSec;
+
+      // TODO, these boundary conditions are temporary and must be fixed.
       if (position.x < 0)
         position.zeroX();
       if (position.y > _grid.getWidth())
@@ -124,6 +126,7 @@ void FluidSolver::advectVelocity(float timeStepSec)
         position.zeroY();
       if (position.y > _grid.getHeight())
         position.y = _grid.getHeight();
+
       cell.stagedVel[Cell::X] = _grid.getVelocity(position).x;
     }
   for(float y = 0; y < _grid.getHeight(); y += 1.0f)
@@ -131,6 +134,8 @@ void FluidSolver::advectVelocity(float timeStepSec)
       Cell &cell = _grid(floor(x), floor(y));
       Vector2 position(x, y); 
       position += _grid.getVelocity(position) * -timeStepSec;
+
+      // TODO, these boundary conditions are temporary and must be fixed.
       if (position.x < 0)
         position.zeroX();
       if (position.y > _grid.getWidth())
@@ -139,6 +144,7 @@ void FluidSolver::advectVelocity(float timeStepSec)
         position.zeroY();
       if (position.y > _grid.getHeight())
         position.y = _grid.getHeight();
+
       cell.stagedVel[Cell::Y] = _grid.getVelocity(position).y;
     }
   for(unsigned i = 0; i < _grid.getRowCount() * _grid.getColCount(); i++) {
@@ -208,8 +214,8 @@ void FluidSolver::draw(IFluidRenderer *renderer)
   // If a new frame is ready for rendering, draw it.
   if (_frameCalculated) {
     renderer->beginFrame();
-    renderer->drawGrid(_grid);
     renderer->drawCells(_grid);
+    renderer->drawGrid(_grid);
     renderer->drawVectors(_grid);
     renderer->drawParticles(_particles);
     renderer->endFrame();

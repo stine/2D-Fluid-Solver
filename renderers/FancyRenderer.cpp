@@ -138,6 +138,7 @@ void FancyRenderer::drawGrid(const Grid &grid)
 
   // Draw the vertical and horizontal grid lines.
   // TODO, use buffer objects.
+  glDepthMask(GL_FALSE);
   glBegin(GL_LINES);
   for (unsigned i = 0; i <= width; ++i) {
     glVertex2f(i, 0);
@@ -148,6 +149,7 @@ void FancyRenderer::drawGrid(const Grid &grid)
     glVertex2f(width, i);
   }
   glEnd();
+  glDepthMask(GL_TRUE);
 }
 
 
@@ -161,7 +163,7 @@ void FancyRenderer::drawCells(const Grid &grid)
   glUseProgram(_cellProgram);
 
   // Load uniforms.
-  //TODO: {1.0f, 1.0f, 1.0f, 0.1f};
+  //  float cellColor[4] = {1.0f, 1.0f, 1.0f, 0.1f};
   float cellColor[4] = {0.1f, 0.1f, 0.1f, 1.0f};  
   glUniform4fv(glGetUniformLocation(_cellProgram, "color"), 1, cellColor);
   glUniformMatrix4fv(glGetUniformLocation(_cellProgram, "mvpMatrix"),
