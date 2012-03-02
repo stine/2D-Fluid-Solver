@@ -28,7 +28,7 @@ SOURCES += $$BaseDirectory/ui/MainWindow.cpp \
            $$BaseDirectory/solver/FluidSolver.cpp \
            $$BaseDirectory/solver/Grid.cpp \
            $$BaseDirectory/solver/Cell.cpp \
-           $$BaseDirectory/renderers/IFluidRenderer.cpp \
+           $$BaseDirectory/renderers/Shader.cpp \
            $$BaseDirectory/renderers/CompatibilityRenderer.cpp \
            $$BaseDirectory/renderers/FancyRenderer.cpp \
 	   $$BaseDirectory/renderers/bstrlib.c \
@@ -41,6 +41,7 @@ HEADERS += $$BaseDirectory/ui/MainWindow.h \
            $$BaseDirectory/solver/Cell.h \
            $$BaseDirectory/solver/FluidSolver.h \
            $$BaseDirectory/solver/Grid.h \
+           $$BaseDirectory/renderers/Shader.h \
            $$BaseDirectory/renderers/GL3/gl3.h \
 	   $$BaseDirectory/renderers/bstrlib.h \
 	   $$BaseDirectory/renderers/glsw.h \

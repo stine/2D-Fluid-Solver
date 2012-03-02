@@ -7,6 +7,7 @@
 #include "IFluidRenderer.h"
 #include "Grid.h"
 #include "GL3/gl3.h"
+#include "Shader.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_access.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -17,10 +18,10 @@ class FancyRenderer : public IFluidRenderer
 {
 private:
   GLuint    _macGridBuffer;
-  GLuint    _gridProgram;
-  GLuint    _cellProgram;
-  GLuint    _vectorProgram;
-  GLuint    _particleProgram;  
+  Shader    _gridProgram;
+  Shader    _cellProgram;
+  Shader    _vectorProgram;
+  Shader    _particleProgram;  
   glm::mat4 _mvMatrix;
   glm::mat4 _mvpMatrix;  // Projection * ModelView matrix
   float     _gridColor[4];

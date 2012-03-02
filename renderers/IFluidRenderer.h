@@ -88,14 +88,6 @@ public:
   // Returns:
   //   None
   virtual void drawParticles(const std::vector<Vector2> &particles) = 0;
-
-
-protected:
-  // TODO documentation
-  GLuint shaderObj(GLenum shaderType, const char *shaderText);
-
-  // TODO documentation  
-  GLuint shaderProgram(const std::vector<GLuint> &shaderList);
 };
 
 #endif // __FLUID_RENDERER_H__

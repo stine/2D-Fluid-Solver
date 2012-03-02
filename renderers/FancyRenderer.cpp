@@ -1,10 +1,10 @@
 #include "GL3/gl3.h"
-#include "FancyRenderer.h"
 #include <cstdio>
 #include <vector>
 #include <string>
 #include <cstdio>
-#include "glsw.h"
+#include "FancyRenderer.h"
+#include "Shader.h"
 
 // TODO - YUCK - This global variable is a temporary hack!!!
 #include "FluidSolver.h"
@@ -25,10 +25,6 @@ QGLFormat FancyRenderer::getFormat()
 
 FancyRenderer::FancyRenderer()
   : _macGridBuffer(0),
-    _gridProgram(0),
-    _cellProgram(0),
-    _vectorProgram(0),
-    _particleProgram(0),
     _mvMatrix(1.0f),
     _mvpMatrix(1.0f)
 {
@@ -41,42 +37,6 @@ FancyRenderer::~FancyRenderer()
 }
 
 
-GLuint FancyRenderer::initShader(string effectName)
-{
-  GLuint program;
-  string shaderString;
-  vector<GLuint> objects;
-
-  glswInit();
-  
-  // Load shader program text.
-  glswSetPath("./", ".glsl");
-  const char *vs = glswGetShader((effectName + ".Vertex").c_str());
-  if (!vs) {
-    fprintf(stderr, "%s\n", glswGetError());
-    glswShutdown();
-    return 0;
-  }
-  const char *fs = glswGetShader((effectName + ".Fragment").c_str());
-  if (!fs) {
-    fprintf(stderr, "%s\n", glswGetError());
-    glswShutdown();
-    return 0;
-  }
-
-  // Compile shader programs.
-  objects.push_back(shaderObj(GL_VERTEX_SHADER, vs));
-  objects.push_back(shaderObj(GL_FRAGMENT_SHADER, fs));
-
-  // Link shader program.
-  program = shaderProgram(objects);
-
-  glswShutdown();
-
-  return program;
-}
-
-
 void FancyRenderer::initialize()
 {
   // Basic OpenGL setup.
@@ -85,10 +45,10 @@ void FancyRenderer::initialize()
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
   // Load all shader programs.
-  _gridProgram = initShader("Grid");
-  _cellProgram = initShader("Cells");
-  _vectorProgram = initShader("Vectors");
-  _particleProgram = initShader("Particles");
+  _gridProgram.compile("Grid.Vertex", NULL, "Grid.Fragment");
+  _cellProgram.compile("Cells.Vertex", NULL, "Cells.Fragment");
+  _vectorProgram.compile("Vectors.Vertex", "Vectors.Geometry", "Vectors.Fragment");
+  _particleProgram.compile("Particles.Vertex", NULL, "Particles.Fragment");
 
   // Set default modelview matrix.
   _mvMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -10));
