@@ -24,8 +24,7 @@ QGLFormat FancyRenderer::getFormat()
 
 
 FancyRenderer::FancyRenderer()
-  : _macGridBuffer(0),
-    _mvMatrix(1.0f),
+  : _mvMatrix(1.0f),
     _mvpMatrix(1.0f)
 {
 }
@@ -33,7 +32,7 @@ FancyRenderer::FancyRenderer()
 
 FancyRenderer::~FancyRenderer()
 {
-  glDeleteBuffers(1, &_macGridBuffer);
+  // TODO delete buffers and vertex arrays
 }
 
 
@@ -51,18 +50,26 @@ void FancyRenderer::initialize()
   _gridProgram.compile("Grid.Vertex", NULL, "Grid.Fragment");
   glBindAttribLocation(_gridProgram, 0, "position");
   glBindFragDataLocation(_gridProgram, 0, "fragcolor");
+  glGenVertexArrays(1, &_macGridVAO);
+  glGenBuffers(1, &_macGridVBO);
 
   _cellProgram.compile("Cells.Vertex", NULL, "Cells.Fragment");
   glBindAttribLocation(_cellProgram, 0, "position");
   glBindFragDataLocation(_cellProgram, 0, "fragcolor");
+  glGenVertexArrays(1, &_macCellVAO);
+  glGenBuffers(1, &_macCellVBO);
 
   _vectorProgram.compile("Vectors.Vertex", NULL, "Vectors.Fragment");
   glBindAttribLocation(_vectorProgram, 0, "position");
   glBindFragDataLocation(_vectorProgram, 0, "fragcolor");
+  glGenVertexArrays(1, &_velocityVAO);
+  glGenBuffers(1, &_velocityVBO);
 
   _particleProgram.compile("Particles.Vertex", NULL, "Particles.Fragment");
   glBindAttribLocation(_particleProgram, 0, "position");
   glBindFragDataLocation(_particleProgram, 0, "fragcolor");
+  glGenVertexArrays(1, &_particlesVAO);
+  glGenBuffers(1, &_particlesVBO);
 
   // Set default modelview matrix.
   _mvMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -10));
@@ -105,7 +112,7 @@ void FancyRenderer::resize(int pixWidth, int pixHeight)
     xMax = xMin + simWidth;
   }
   
-  // Define projection  matrix based on widget size.  Multiply by modelview matrix.
+  // Define projection matrix based on widget size.  Multiply by modelview matrix.
   _mvpMatrix = glm::ortho(xMin, xMax, yMin, yMax, 5.0f, 15.0f) * _mvMatrix;
 }
 
@@ -215,21 +222,46 @@ void FancyRenderer::drawVectors(const Grid &grid)
 
 void FancyRenderer::drawParticles(const std::vector<Vector2> &particles)
 {
-  // Select shader program.
-  glUseProgram(_particleProgram);
-
-  // Load uniforms.
-  float vecColor[4] = {0.0f, 0.6f, 0.8f, 1.0f};
-  glUniform4fv(glGetUniformLocation(_vectorProgram, "color"), 1, vecColor);
-  glUniformMatrix4fv(glGetUniformLocation(_vectorProgram, "mvpMatrix"),
-		     1, false, &_mvpMatrix[0][0]);
-  
-  // Draw the fluid particles.
-  glBegin(GL_POINTS);
+  // Load particle position values into a contiguous array.
+  // TODO replace with vector.
+  unsigned elemCount = particles.size() * 3;
+  GLfloat *position = new GLfloat[elemCount];
   vector<Vector2>::const_iterator itr = particles.begin();
-  for(; itr != particles.end(); ++itr)
-  {
-    glVertex2f(itr->x, itr->y);
+  unsigned i = 0;
+  for ( ; itr != particles.end(); ++itr) {
+    position[i + 0] = itr->x;
+    position[i + 1] = itr->y;
+    position[i + 2] = 0.0f;
+    i += 3;
   }
-  glEnd();
+
+  // Get generic attribute and uniform indices.
+  GLuint posIdx = glGetAttribLocation(_particleProgram, "position");
+  GLuint colIdx = glGetUniformLocation(_particleProgram, "color");
+  GLuint mvpIdx = glGetUniformLocation(_particleProgram, "mvpMatrix");
+
+  // Bind the particles VAO.
+  glBindVertexArray(_particlesVAO);
+
+  // Assume that we must regenerate the particles VBO.
+  glEnableVertexAttribArray(posIdx);
+  glBindBuffer(GL_ARRAY_BUFFER, _particlesVBO);
+  glBufferData(GL_ARRAY_BUFFER, elemCount * sizeof(GLfloat), position, GL_DYNAMIC_DRAW);
+  glVertexAttribPointer(posIdx, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+  // Select shader program and load uniforms.
+  float vecColor[4] = {0.0f, 0.6f, 0.8f, 1.0f};
+  glUseProgram(_particleProgram);
+  glUniform4fv(colIdx, 1, vecColor);
+  glUniformMatrix4fv(mvpIdx, 1, false, &_mvpMatrix[0][0]);
+
+  // Draw the bound VAO.
+  glDrawArrays(GL_POINTS, 0, particles.size());
+
+  // Unbind particles VAO and Program.
+  glUseProgram(0);
+  glBindVertexArray(0);
+
+  // Clean up memory.
+  delete [] position;
 }

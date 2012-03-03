@@ -17,14 +17,23 @@
 class FancyRenderer : public IFluidRenderer
 {
 private:
+  // Vertex Array objects
+  GLuint _macGridVAO;
+  GLuint _macCellVAO;
+  GLuint _velocityVAO;
+  GLuint _particlesVAO;
+
   // Buffer objects
-  GLuint    _macGridBuffer;
+  GLuint _macGridVBO;
+  GLuint _macCellVBO;
+  GLuint _velocityVBO;
+  GLuint _particlesVBO;
   
   // Shader programs
-  Shader    _gridProgram;
-  Shader    _cellProgram;
-  Shader    _vectorProgram;
-  Shader    _particleProgram;  
+  Shader _gridProgram;
+  Shader _cellProgram;
+  Shader _vectorProgram;
+  Shader _particleProgram;  
   
   // Matrices
   glm::mat4 _mvMatrix;
