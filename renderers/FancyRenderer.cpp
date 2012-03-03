@@ -24,7 +24,10 @@ QGLFormat FancyRenderer::getFormat()
 
 
 FancyRenderer::FancyRenderer()
-  : _mvMatrix(1.0f),
+  : _isCellVBO(false),
+    _isGridVBO(false),
+    _isCellCenterPtsVBO(false),
+    _mvMatrix(1.0f),
     _mvpMatrix(1.0f)
 {
 }
@@ -50,20 +53,22 @@ void FancyRenderer::initialize()
   _gridProgram.compile("Grid.Vertex", NULL, "Grid.Fragment");
   glBindAttribLocation(_gridProgram, 0, "position");
   glBindFragDataLocation(_gridProgram, 0, "fragcolor");
-  glGenVertexArrays(1, &_macGridVAO);
-  glGenBuffers(1, &_macGridVBO);
+  glGenVertexArrays(1, &_gridVAO);
+  glGenBuffers(1, &_gridVBO);
 
   _cellProgram.compile("Cells.Vertex", NULL, "Cells.Fragment");
   glBindAttribLocation(_cellProgram, 0, "position");
   glBindFragDataLocation(_cellProgram, 0, "fragcolor");
-  glGenVertexArrays(1, &_macCellVAO);
-  glGenBuffers(1, &_macCellVBO);
+  glGenVertexArrays(1, &_cellVAO);
+  glGenBuffers(1, &_cellVBO);
 
-  _vectorProgram.compile("Vectors.Vertex", NULL, "Vectors.Fragment");
-  glBindAttribLocation(_vectorProgram, 0, "position");
-  glBindFragDataLocation(_vectorProgram, 0, "fragcolor");
+  _velocityProgram.compile("Velocity.Vertex", NULL, "Velocity.Fragment");
+  glBindAttribLocation(_velocityProgram, 0, "position");
+  glBindAttribLocation(_velocityProgram, 0, "velocity");
+  glBindFragDataLocation(_velocityProgram, 0, "fragcolor");
   glGenVertexArrays(1, &_velocityVAO);
-  glGenBuffers(1, &_velocityVBO);
+  glGenBuffers(1, &_cellCenterPtsVBO);
+  glGenBuffers(1, &_velocityVecsVBO);
 
   _particleProgram.compile("Particles.Vertex", NULL, "Particles.Fragment");
   glBindAttribLocation(_particleProgram, 0, "position");
@@ -130,33 +135,60 @@ void FancyRenderer::endFrame()
 
 void FancyRenderer::drawGrid(const Grid &grid)
 {
-  // Get grid dimensions.
-  float height = grid.getRowCount() - 1;
-  float width  = grid.getColCount() - 1;
+  // Get generic attribute and uniform indices.
+  GLuint posIdx = glGetAttribLocation(_gridProgram, "position");
+  GLuint colIdx = glGetUniformLocation(_gridProgram, "color");
+  GLuint mvpIdx = glGetUniformLocation(_gridProgram, "mvpMatrix");
 
-  // Select shader program.
-  glUseProgram(_gridProgram);
-  
-  // Load uniforms.
+  // Bind the grid VAO.
+  glBindVertexArray(_gridVAO);
+
+  // If the VBO with grid geometry hasn't been initialized, do it.
+  if (!_isGridVBO) {
+    // Load the grid geometry into a contiguous array.
+    const float width = grid.getWidth();
+    const float height = grid.getHeight();
+    _lineCount = (width + 1) * (height + 1);
+    GLfloat *lineVerts = new GLfloat[_lineCount * 2];
+    unsigned i = 0;
+    for (float x = 0.0f; x <= width; x += 1.0f) {
+      lineVerts[i++] = x;
+      lineVerts[i++] = 0.0f;
+      lineVerts[i++] = x;
+      lineVerts[i++] = height;
+    }
+    for (float y = 0.0f; y <= height; y += 1.0f) {
+      lineVerts[i++] = 0.0f;
+      lineVerts[i++] = y;
+      lineVerts[i++] = width;
+      lineVerts[i++] = y;
+    }
+
+    // Upload grid geometry into a buffer object. Cleanup memory.
+    glEnableVertexAttribArray(posIdx);
+    glBindBuffer(GL_ARRAY_BUFFER, _gridVBO);
+    glBufferData(GL_ARRAY_BUFFER, _lineCount * 2 * sizeof(GLfloat), lineVerts, GL_STATIC_DRAW);
+    glVertexAttribPointer(posIdx, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    delete [] lineVerts;
+
+    // Set initialized flag to 'true'.
+    _isGridVBO = true;
+  }
+
+  // Select shader program and load uniforms.
   float gridColor[4] = {0.2f, 0.2f, 0.2f, 1.0f};
-  glUniform4fv(glGetUniformLocation(_gridProgram, "color"), 1, gridColor);
-  glUniformMatrix4fv(glGetUniformLocation(_gridProgram, "mvpMatrix"),
-		     1, false, &_mvpMatrix[0][0]);
+  glUseProgram(_gridProgram);
+  glUniform4fv(colIdx, 1, gridColor);
+  glUniformMatrix4fv(mvpIdx, 1, false, &_mvpMatrix[0][0]);
 
-  // Draw the vertical and horizontal grid lines.
-  // TODO, use buffer objects.
+  // Draw the bound VAO.
   glDepthMask(GL_FALSE);
-  glBegin(GL_LINES);
-  for (unsigned i = 0; i <= width; ++i) {
-    glVertex2f(i, 0);
-    glVertex2f(i, height);
-  }
-  for (unsigned i = 0; i <= height; ++i) {
-    glVertex2f(0, i);
-    glVertex2f(width, i);
-  }
-  glEnd();
+  glDrawArrays(GL_LINES, 0, _lineCount * 2);
   glDepthMask(GL_TRUE);
+
+  // Unbind VAO and Program.  Clean up memory.
+  glBindVertexArray(0);
+  glUseProgram(0);
 }
 
 
@@ -198,43 +230,70 @@ void FancyRenderer::drawCells(const Grid &grid)
 
 void FancyRenderer::drawVectors(const Grid &grid)
 {
-  // Select shader program.
-  glUseProgram(_vectorProgram);
-  
-  // Load uniforms.
-  float vecColor[4] = {1.0f, 1.0f, 0.0f, 1.0f};
-  glUniform4fv(glGetUniformLocation(_vectorProgram, "color"), 1, vecColor);
-  glUniformMatrix4fv(glGetUniformLocation(_vectorProgram, "mvpMatrix"),
-		     1, false, &_mvpMatrix[0][0]);
+  // Get generic attribute and uniform indices.
+  GLuint posIdx = glGetAttribLocation(_velocityProgram, "position");
+  GLuint velIdx = glGetAttribLocation(_velocityProgram, "velocity");
+  GLuint mvpIdx = glGetUniformLocation(_velocityProgram, "mvpMatrix");
 
-  // Draw the velocity vector at the center of each cell.
-  for (float y = 0.5f; y < grid.getHeight(); y += 1.0f) {
-    for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
-      Vector2 vec = grid.getVelocity(Vector2(x, y)) * 0.5;
-      glBegin(GL_LINES);
-      glVertex2f(x, y);
-      glVertex2f(x + vec.x, y + vec.y);
-      glEnd();
-    }
+  // Bind the velocity VAO.
+  glBindVertexArray(_velocityVAO);
+
+  // If the VBO with cell center positions hasn't been initialized, do it.
+  if (!_isCellCenterPtsVBO) {
+    // Load the cell midpoints into a contiguous array.
+    unsigned cellCount = grid.getHeight() * grid.getWidth();
+    GLfloat *middleVerts = new GLfloat[cellCount * 2];
+    unsigned i = 0;
+    for (float y = 0.5f; y < grid.getHeight(); y += 1.0f)
+      for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
+	middleVerts[i++] = x;
+	middleVerts[i++] = y;
+      }
+
+    // Upload cell midpoint data to a buffer object. Cleanup memory.
+    glEnableVertexAttribArray(posIdx);
+    glBindBuffer(GL_ARRAY_BUFFER, _cellCenterPtsVBO);
+    glBufferData(GL_ARRAY_BUFFER, cellCount * 2 * sizeof(GLfloat), middleVerts, GL_STATIC_DRAW);
+    glVertexAttribPointer(posIdx, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    delete [] middleVerts;
+
+    // Set initialized flag to 'true'.
+    _isCellCenterPtsVBO = true;
   }
+
+  // Load the velocity field into a contiguous array.
+  unsigned cellCount = grid.getHeight() * grid.getWidth();
+  GLfloat *velField = new GLfloat[cellCount * 2];
+  unsigned i = 0;
+  for (float y = 0.5f; y < grid.getHeight(); y += 1.0f)
+    for (float x = 0.5f; x < grid.getWidth(); x += 1.0f) {
+      Vector2 vel = grid.getVelocity(Vector2(x, y));
+      velField[i++] = vel.x;
+      velField[i++] = vel.y;
+    }
+
+  // Upload the velocity field data into a buffer object.  Clean up memory.
+  glEnableVertexAttribArray(velIdx);
+  glBindBuffer(GL_ARRAY_BUFFER, _velocityVecsVBO);
+  glBufferData(GL_ARRAY_BUFFER, cellCount * 2 * sizeof(GLfloat), velField, GL_DYNAMIC_DRAW);
+  glVertexAttribPointer(velIdx, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  delete [] velField;
+  
+  // Select shader program and load uniforms.
+  glUseProgram(_velocityProgram);
+  glUniformMatrix4fv(mvpIdx, 1, false, &_mvpMatrix[0][0]);
+
+  // Draw the bound VAO.
+  glDrawArrays(GL_POINTS, 0, cellCount);
+
+  // Unbind VAO and Program.  Clean up memory.
+  glBindVertexArray(0);
+  glUseProgram(0);
 }
 
 
 void FancyRenderer::drawParticles(const std::vector<Vector2> &particles)
 {
-  // Load particle position values into a contiguous array.
-  // TODO replace with vector.
-  unsigned elemCount = particles.size() * 3;
-  GLfloat *position = new GLfloat[elemCount];
-  vector<Vector2>::const_iterator itr = particles.begin();
-  unsigned i = 0;
-  for ( ; itr != particles.end(); ++itr) {
-    position[i + 0] = itr->x;
-    position[i + 1] = itr->y;
-    position[i + 2] = 0.0f;
-    i += 3;
-  }
-
   // Get generic attribute and uniform indices.
   GLuint posIdx = glGetAttribLocation(_particleProgram, "position");
   GLuint colIdx = glGetUniformLocation(_particleProgram, "color");
@@ -243,11 +302,22 @@ void FancyRenderer::drawParticles(const std::vector<Vector2> &particles)
   // Bind the particles VAO.
   glBindVertexArray(_particlesVAO);
 
-  // Assume that we must regenerate the particles VBO.
+  // Load particle position values into a contiguous array.
+  unsigned vertCount = particles.size();
+  GLfloat *position = new GLfloat[vertCount * 2];
+  vector<Vector2>::const_iterator itr = particles.begin();
+  unsigned i = 0;
+  for ( ; itr != particles.end(); ++itr) {
+    position[i] = itr->x; ++i;
+    position[i] = itr->y; ++i;
+  }
+
+  // Upload new data to the buffer object. Clean up memory.
   glEnableVertexAttribArray(posIdx);
   glBindBuffer(GL_ARRAY_BUFFER, _particlesVBO);
-  glBufferData(GL_ARRAY_BUFFER, elemCount * sizeof(GLfloat), position, GL_DYNAMIC_DRAW);
-  glVertexAttribPointer(posIdx, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glBufferData(GL_ARRAY_BUFFER, vertCount * 2 * sizeof(GLfloat), position, GL_DYNAMIC_DRAW);
+  glVertexAttribPointer(posIdx, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  delete [] position;
 
   // Select shader program and load uniforms.
   float vecColor[4] = {0.0f, 0.6f, 0.8f, 1.0f};
@@ -256,12 +326,9 @@ void FancyRenderer::drawParticles(const std::vector<Vector2> &particles)
   glUniformMatrix4fv(mvpIdx, 1, false, &_mvpMatrix[0][0]);
 
   // Draw the bound VAO.
-  glDrawArrays(GL_POINTS, 0, particles.size());
+  glDrawArrays(GL_POINTS, 0, vertCount);
 
-  // Unbind particles VAO and Program.
-  glUseProgram(0);
+  // Unbind particles VAO and Program. Clean up memory.
   glBindVertexArray(0);
-
-  // Clean up memory.
-  delete [] position;
+  glUseProgram(0);
 }

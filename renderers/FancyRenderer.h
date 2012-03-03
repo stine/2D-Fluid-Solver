@@ -17,23 +17,30 @@
 class FancyRenderer : public IFluidRenderer
 {
 private:
-  // Vertex Array objects
-  GLuint _macGridVAO;
-  GLuint _macCellVAO;
-  GLuint _velocityVAO;
-  GLuint _particlesVAO;
-
-  // Buffer objects
-  GLuint _macGridVBO;
-  GLuint _macCellVBO;
-  GLuint _velocityVBO;
-  GLuint _particlesVBO;
-  
-  // Shader programs
-  Shader _gridProgram;
+  // Related to drawing MAC cell backgrounds
+  GLuint _cellVAO;
+  GLuint _cellVBO;
+  bool   _isCellVBO;
   Shader _cellProgram;
-  Shader _vectorProgram;
-  Shader _particleProgram;  
+  
+  // Related to drawing MAC cell grid lines
+  GLuint   _gridVAO;
+  GLuint   _gridVBO;
+  bool     _isGridVBO;
+  unsigned _lineCount;
+  Shader   _gridProgram;
+
+  // Related to drawing velocity vectors
+  GLuint _velocityVAO;
+  GLuint _cellCenterPtsVBO;
+  GLuint _velocityVecsVBO;
+  bool   _isCellCenterPtsVBO;
+  Shader _velocityProgram;
+
+  // Related to drawing particles
+  GLuint _particlesVAO;
+  GLuint _particlesVBO;
+  Shader _particleProgram;
   
   // Matrices
   glm::mat4 _mvMatrix;
