@@ -4,3 +4,4 @@ TEMPLATE = app
 TARGET   = 2D-Fluid-Solver
 
 SOURCES += main.cpp
+LIBS    += -lGLEW

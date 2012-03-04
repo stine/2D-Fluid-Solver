@@ -12,4 +12,5 @@ HEADERS += Vector2Test.h \
 
 SOURCES += tests.cpp
 
-LIBS    += -lgtest
+LIBS    += -lgtest \
+           -lGLEW

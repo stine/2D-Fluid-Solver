@@ -18,10 +18,11 @@ class FancyRenderer : public IFluidRenderer
 {
 private:
   // Related to drawing MAC cell backgrounds
-  GLuint _cellVAO;
-  GLuint _cellVBO;
-  bool   _isCellVBO;
-  Shader _cellProgram;
+  GLuint   _cellVAO;
+  GLuint   _cellVBO;
+  bool     _isCellVBO;
+  unsigned _cellCount;
+  Shader   _cellProgram;
   
   // Related to drawing MAC cell grid lines
   GLuint   _gridVAO;

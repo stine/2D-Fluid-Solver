@@ -1,3 +1,4 @@
+#include "GL/glew.h"
 #include "GL3/gl3.h"
 #include <cstdio>
 #include <vector>
@@ -56,7 +57,10 @@ void FancyRenderer::initialize()
   glGenVertexArrays(1, &_gridVAO);
   glGenBuffers(1, &_gridVBO);
 
-  _cellProgram.compile("Cells.Vertex", NULL, "Cells.Fragment");
+  _cellProgram.compile("Cells.Vertex", "Cells.Geometry", "Cells.Fragment");
+  glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_VERTICES_OUT_EXT, 4);
+  glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
+  glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
   glBindAttribLocation(_cellProgram, 0, "position");
   glBindFragDataLocation(_cellProgram, 0, "fragcolor");
   glGenVertexArrays(1, &_cellVAO);
@@ -195,36 +199,56 @@ void FancyRenderer::drawGrid(const Grid &grid)
 void FancyRenderer::drawCells(const Grid &grid)
 {
   // Get grid dimensions.
-  float height = grid.getRowCount();
-  float width  = grid.getColCount();
-  
-  // Select shader program.
-  glUseProgram(_cellProgram);
+  const float width = grid.getWidth();
+  const float height = grid.getHeight();
 
-  // Load uniforms.
-  //  float cellColor[4] = {1.0f, 1.0f, 1.0f, 0.1f};
-  float cellColor[4] = {0.1f, 0.1f, 0.1f, 1.0f};  
-  glUniform4fv(glGetUniformLocation(_cellProgram, "color"), 1, cellColor);
-  glUniformMatrix4fv(glGetUniformLocation(_cellProgram, "mvpMatrix"),
-		     1, false, &_mvpMatrix[0][0]);
+  // Get generic attribute and uniform indices.
+  GLuint posIdx = glGetAttribLocation(_cellProgram, "position");
+  GLuint widIdx = glGetUniformLocation(_cellProgram, "cellWidth");
+  GLuint colIdx = glGetUniformLocation(_cellProgram, "color");
+  GLuint mvpIdx = glGetUniformLocation(_cellProgram, "mvpMatrix");
 
-  // Draw the MAC grid cells if they contain fluid.
-  glDepthMask(GL_FALSE);
-  for (unsigned y = 0; y < height; ++y) {
-    for (unsigned x = 0; x < width; ++x) {
-      if (grid(x, y).cellType == Cell::FLUID) {
-	glBegin(GL_TRIANGLES);
-	glVertex2f(x, y);
-	glVertex2f(x+1, y);
-	glVertex2f(x+1, y+1);
-	glVertex2f(x+1, y+1);
-	glVertex2f(x, y+1);
-	glVertex2f(x, y);
-	glEnd();
+  // Bind the cell VAO.
+  glBindVertexArray(_cellVAO);
+
+  // If the VBO with cell positions hasn't been initialized, do it.
+  if (!_isCellVBO) {
+    // Load the cell positions into a contiguous array.
+    _cellCount = width * height;
+    GLfloat *cellVerts= new GLfloat[_cellCount * 2];
+    unsigned i = 0;
+    for (float y = 0.5f; y < height; y += 1.0f)
+      for (float x = 0.5f; x < width; x += 1.0f) {
+	cellVerts[i++] = x;
+	cellVerts[i++] = y;
       }
-    }
+
+    // Upload cell positions into a buffer object. Clean up memory.
+    glEnableVertexAttribArray(posIdx);
+    glBindBuffer(GL_ARRAY_BUFFER, _cellVBO);
+    glBufferData(GL_ARRAY_BUFFER, _cellCount * 2 * sizeof(GLfloat), cellVerts, GL_STATIC_DRAW);
+    glVertexAttribPointer(posIdx, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    delete [] cellVerts;
+    
+    // Set initialized flag to 'true'.
+    _isCellVBO = true;
   }
+
+  // Select shader program and load uniforms.
+  float cellColor[4] = {0.1f, 0.1f, 0.1f, 1.0f};
+  glUseProgram(_cellProgram);
+  glUniform1f(widIdx, 1.0f);
+  glUniform4fv(colIdx, 1, cellColor);
+  glUniformMatrix4fv(mvpIdx, 1, false, &_mvpMatrix[0][0]);
+
+  // Draw the bound VAO.
+  glDepthMask(GL_FALSE);
+  glDrawArrays(GL_POINTS, 0, _cellCount);
   glDepthMask(GL_TRUE);
+
+  // Unbind VAO and Program.  Clean up memory.
+  glBindVertexArray(0);
+  glUseProgram(0);
 }
 
 
