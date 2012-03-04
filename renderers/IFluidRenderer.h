@@ -1,7 +1,7 @@
 #ifndef __I_FLUID_RENDERER_H__
 #define __I_FLUID_RENDERER_H__
 
-#include "GL3/gl3.h"
+#include "GL/glew.h"
 #include <QGLFormat>
 #include <vector>
 #include "Grid.h"

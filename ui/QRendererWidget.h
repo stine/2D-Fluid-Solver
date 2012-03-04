@@ -1,6 +1,7 @@
 #ifndef __Q_RENDERER_WIDGET_H__
 #define __Q_RENDERER_WIDGET_H__
 
+#include "GL/glew.h"
 #include <QGLWidget>
 #include "IFluidRenderer.h"
 

@@ -1,12 +1,12 @@
 #ifndef __FANCY_RENDERER_H__
 #define __FANCY_RENDERER_H__
 
+#include "GL/glew.h"
 #include <QGLWidget>
 #include <vector>
 #include <string>
 #include "IFluidRenderer.h"
 #include "Grid.h"
-#include "GL3/gl3.h"
 #include "Shader.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_access.hpp"

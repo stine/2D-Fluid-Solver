@@ -1,6 +1,7 @@
 #ifndef __MAINWINDOW_H__
 #define __MAINWINDOW_H__
 
+#include "GL/glew.h"
 #include <QtGui>
 #include <QWidget>
 #include "QRendererWidget.h"

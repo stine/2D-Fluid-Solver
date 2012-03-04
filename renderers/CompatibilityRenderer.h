@@ -1,6 +1,7 @@
 #ifndef __COMPATIBILITY_RENDERER_H__
 #define __COMPATIBILITY_RENDERER_H__
 
+#include "GL/glew.h"
 #include <QGLWidget>
 #include <vector>
 #include "IFluidRenderer.h"

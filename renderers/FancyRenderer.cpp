@@ -1,5 +1,4 @@
 #include "GL/glew.h"
-#include "GL3/gl3.h"
 #include <cstdio>
 #include <vector>
 #include <string>
@@ -42,6 +41,9 @@ FancyRenderer::~FancyRenderer()
 
 void FancyRenderer::initialize()
 {
+  // Initialize the GL Extension Wrangler.
+  glewInit();
+
   // Basic OpenGL setup.
   glEnable(GL_BLEND);
   glBlendEquation(GL_FUNC_ADD);

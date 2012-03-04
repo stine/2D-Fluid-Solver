@@ -1,3 +1,4 @@
+#include "GL/glew.h"
 #include <QtGui>
 #include "MainWindow.h"
 #include "QRendererWidget.h"
