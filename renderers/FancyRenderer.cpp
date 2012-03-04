@@ -148,8 +148,8 @@ void FancyRenderer::drawGrid(const Grid &grid)
     // Load the grid geometry into a contiguous array.
     const float width = grid.getWidth();
     const float height = grid.getHeight();
-    _lineCount = (width + 1) * (height + 1);
-    GLfloat *lineVerts = new GLfloat[_lineCount * 2];
+    _lineVertCnt = (width + 1 + height + 1) * 2;
+    GLfloat *lineVerts = new GLfloat[_lineVertCnt * 2];
     unsigned i = 0;
     for (float x = 0.0f; x <= width; x += 1.0f) {
       lineVerts[i++] = x;
@@ -167,7 +167,7 @@ void FancyRenderer::drawGrid(const Grid &grid)
     // Upload grid geometry into a buffer object. Cleanup memory.
     glEnableVertexAttribArray(posIdx);
     glBindBuffer(GL_ARRAY_BUFFER, _gridVBO);
-    glBufferData(GL_ARRAY_BUFFER, _lineCount * 2 * sizeof(GLfloat), lineVerts, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, _lineVertCnt * 2 * sizeof(GLfloat), lineVerts, GL_STATIC_DRAW);
     glVertexAttribPointer(posIdx, 2, GL_FLOAT, GL_FALSE, 0, 0);
     delete [] lineVerts;
 
@@ -183,7 +183,7 @@ void FancyRenderer::drawGrid(const Grid &grid)
 
   // Draw the bound VAO.
   glDepthMask(GL_FALSE);
-  glDrawArrays(GL_LINES, 0, _lineCount * 2);
+  glDrawArrays(GL_LINES, 0, _lineVertCnt);
   glDepthMask(GL_TRUE);
 
   // Unbind VAO and Program.  Clean up memory.

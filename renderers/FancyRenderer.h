@@ -27,7 +27,7 @@ private:
   GLuint   _gridVAO;
   GLuint   _gridVBO;
   bool     _isGridVBO;
-  unsigned _lineCount;
+  unsigned _lineVertCnt;
   Shader   _gridProgram;
 
   // Related to drawing velocity vectors
