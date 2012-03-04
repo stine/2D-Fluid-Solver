@@ -54,6 +54,7 @@ void FancyRenderer::initialize()
 
   // Load all shader programs and bind attribute locations.
   _gridProgram.compile("Grid.Vertex", NULL, "Grid.Fragment");
+  _gridProgram.link();
   glBindAttribLocation(_gridProgram, 0, "position");
   glBindFragDataLocation(_gridProgram, 0, "fragcolor");
   glGenVertexArrays(1, &_gridVAO);
@@ -63,12 +64,14 @@ void FancyRenderer::initialize()
   glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_VERTICES_OUT_EXT, 4);
   glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
   glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
+  _cellProgram.link();
   glBindAttribLocation(_cellProgram, 0, "position");
   glBindFragDataLocation(_cellProgram, 0, "fragcolor");
   glGenVertexArrays(1, &_cellVAO);
   glGenBuffers(1, &_cellVBO);
 
   _velocityProgram.compile("Velocity.Vertex", NULL, "Velocity.Fragment");
+  _velocityProgram.link();
   glBindAttribLocation(_velocityProgram, 0, "position");
   glBindAttribLocation(_velocityProgram, 0, "velocity");
   glBindFragDataLocation(_velocityProgram, 0, "fragcolor");
@@ -77,6 +80,7 @@ void FancyRenderer::initialize()
   glGenBuffers(1, &_velocityVecsVBO);
 
   _particleProgram.compile("Particles.Vertex", NULL, "Particles.Fragment");
+  _particleProgram.link();
   glBindAttribLocation(_particleProgram, 0, "position");
   glBindFragDataLocation(_particleProgram, 0, "fragcolor");
   glGenVertexArrays(1, &_particlesVAO);

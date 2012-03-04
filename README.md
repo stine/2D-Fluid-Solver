@@ -35,6 +35,8 @@ Our fluid solver uses Qt 4 and QMake to create GUIs and automatically generate M
 
 We also use the Google Test framework in this project.  Again, Linux users can typically find this in their package manager (e.g. `sudo yum install gtest-devel` on Fedora), and everyone else can download it from the [Google Test project page](http://code.google.com/p/googletest/).
 
+Finally, make sure the GL Extension Wrangler library is installed.  Linux users can typically find this in their package manager (e.g. `sudo yum install glew-devel` on Fedora), and everyone else can download it from the [GLEW project page on SourceForge](http://glew.sourceforge.net/).
+
 ### Compiling
 
 Once all dependencies are resolved, change to the top-level directory for the 2D fluid solver project.  Running QMake in this directory will generate the necessary Makefiles.

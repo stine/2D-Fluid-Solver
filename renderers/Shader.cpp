@@ -24,13 +24,38 @@ void Shader::compile(const char *vs, const char *gs, const char *fs)
   // Clean up any existing shader program.
   del();
 
-  // Compile shader programs.
+  // Compile shader objects.
   objects.push_back(shaderObj(GL_VERTEX_SHADER, vs));
   if (gs) objects.push_back(shaderObj(GL_GEOMETRY_SHADER, gs));    
   objects.push_back(shaderObj(GL_FRAGMENT_SHADER, fs));
 
-  // Link shader program.
-  _program = shaderProgram(objects);
+  // Create shader program, attach objects, and flag objects for deletion.
+  _program = glCreateProgram();
+  vector<GLuint>::iterator itr = objects.begin();
+  for ( ; itr != objects.end(); ++itr) {
+    glAttachShader(_program, *itr);
+    glDeleteShader(*itr);
+  }
+}
+
+
+void Shader::link()
+{
+  // Link the provided shader objects into a shader program.
+  glLinkProgram(_program);
+    
+  // Test for failure.  Log an error if so.
+  GLint status;
+  glGetProgramiv (_program, GL_LINK_STATUS, &status);
+  if (status == GL_FALSE) {
+    GLint infoLogLength;
+    glGetProgramiv(_program, GL_INFO_LOG_LENGTH, &infoLogLength);
+        
+    GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+    glGetProgramInfoLog(_program, infoLogLength, NULL, strInfoLog);
+    fprintf(stderr, "Linker failure: %s\n\n", strInfoLog);
+    delete [] strInfoLog;
+  }
 }
 
 
@@ -105,30 +130,3 @@ GLuint Shader::shaderObj(GLenum shaderType, const char *shaderName) const
   glswShutdown();
   return shader;
 }
-
-
-GLuint Shader::shaderProgram(const std::vector<GLuint> &shaderList) const
-{
-  // Link the provided shader objects into a shader program.
-  GLuint program = glCreateProgram();
-  for(size_t iLoop = 0; iLoop < shaderList.size(); iLoop++)
-    glAttachShader(program, shaderList[iLoop]);
-  glLinkProgram(program);
-    
-  // Test for failure.  Log an error if so.
-  GLint status;
-  glGetProgramiv (program, GL_LINK_STATUS, &status);
-  if (status == GL_FALSE) {
-    GLint infoLogLength;
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
-        
-    GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-    glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
-    fprintf(stderr, "Linker failure: %s\n\n", strInfoLog);
-    delete [] strInfoLog;
-  }
-    
-  // Return the linked shader program.
-  return program;
-}
-

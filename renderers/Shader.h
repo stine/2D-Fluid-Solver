@@ -35,6 +35,15 @@ public:
   // 
   // Returns:
   //   None
+  void link();
+
+  // TODO documentation
+  //
+  // Arguments:
+  //   None
+  // 
+  // Returns:
+  //   None
   void del();
 
   // TODO documentation
@@ -67,9 +76,6 @@ public:
 protected:
   // TODO documentation
   GLuint shaderObj(GLenum shaderType, const char *shaderText) const;
-
-  // TODO documentation  
-  GLuint shaderProgram(const std::vector<GLuint> &shaderList) const;
 };
 
 #endif
