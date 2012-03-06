@@ -1,6 +1,6 @@
 -- Vertex
 
-#version 130
+#version 150
 uniform mat4 mvpMatrix;
 in vec2 position;
 void main() {
@@ -11,7 +11,7 @@ void main() {
 
 -- Fragment
 
-#version 130
+#version 150
 uniform vec4 color;
 out vec4 fragcolor;
 void main() {

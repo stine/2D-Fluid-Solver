@@ -1,6 +1,6 @@
 -- Vertex
 
-#version 130
+#version 150
 uniform mat4 mvpMatrix;
 in vec2 position;
 in vec2 velocity;
@@ -12,12 +12,12 @@ void main() {
 
 -- Geometry
 
-#version 130
+#version 150
 
 
 -- Fragment
 
-#version 130
+#version 150
 out vec4 fragcolor;
 void main() {
   fragcolor = vec4(1.0);

@@ -17,7 +17,8 @@ QGLFormat FancyRenderer::getFormat()
 {
   // Specify the necessary OpenGL context attributes for this renderer.
   QGLFormat glFormat;
-  glFormat.setVersion(3, 0);
+  glFormat.setVersion(3, 2);
+  glFormat.setProfile(QGLFormat::CoreProfile);
   glFormat.setSwapInterval(1);
   return glFormat;
 }
@@ -332,8 +333,8 @@ void FancyRenderer::drawParticles(const std::vector<Vector2> &particles)
   vector<Vector2>::const_iterator itr = particles.begin();
   unsigned i = 0;
   for ( ; itr != particles.end(); ++itr) {
-    position[i] = itr->x; ++i;
-    position[i] = itr->y; ++i;
+    position[i++] = itr->x;
+    position[i++] = itr->y;
   }
 
   // Upload new data to the buffer object. Clean up memory.
