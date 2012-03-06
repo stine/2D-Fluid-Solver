@@ -7,7 +7,7 @@ This started as an exploratory effort between [Jason Burton](http://github.com/m
 
 ## Features
 
-![Fluid Solver](http://www.metastine.com/img/feb28.png)
+![Fluid Solver](http://www.metastine.com/img/march6.png)
 
 Implemented features include:
 

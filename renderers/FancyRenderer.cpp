@@ -65,7 +65,7 @@ void FancyRenderer::initialize()
   glGenVertexArrays(1, &_cellVAO);
   glGenBuffers(1, &_cellVBO);
 
-  _velocityProgram.compile("Velocity.Vertex", NULL, "Velocity.Fragment");
+  _velocityProgram.compile("Velocity.Vertex", "Velocity.Geometry", "Velocity.Fragment");
   glBindAttribLocation(_velocityProgram, 0, "position");
   glBindAttribLocation(_velocityProgram, 1, "velocity");
   glBindFragDataLocation(_velocityProgram, 0, "fragcolor");
@@ -259,6 +259,8 @@ void FancyRenderer::drawVectors(const Grid &grid)
   GLuint posIdx = glGetAttribLocation(_velocityProgram, "position");
   GLuint velIdx = glGetAttribLocation(_velocityProgram, "velocity");
   GLuint mvpIdx = glGetUniformLocation(_velocityProgram, "mvpMatrix");
+  GLuint mxvIdx = glGetUniformLocation(_velocityProgram, "maxVelocity");
+  GLuint widIdx = glGetUniformLocation(_velocityProgram, "cellWidth");
 
   // Bind the velocity VAO.
   glBindVertexArray(_velocityVAO);
@@ -305,8 +307,11 @@ void FancyRenderer::drawVectors(const Grid &grid)
   delete [] velField;
   
   // Select shader program and load uniforms.
+  Vector2 maxVel = grid.getMaxVelocity();
   glUseProgram(_velocityProgram);
   glUniformMatrix4fv(mvpIdx, 1, false, &_mvpMatrix[0][0]);
+  glUniform2f(mxvIdx, maxVel.x, maxVel.y);
+  glUniform1f(widIdx, 1.0f);
 
   // Draw the bound VAO.
   glDrawArrays(GL_POINTS, 0, cellCount);

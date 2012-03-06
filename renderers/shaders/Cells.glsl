@@ -2,9 +2,10 @@
 
 #version 150
 in vec2 position;
+out vec4 vPosition;
 void main() {
   // Pass the object-space coordinate to the geometry shader.
-  gl_Position = vec4(position, 0.0, 1.0);
+  vPosition = vec4(position, 0.0, 1.0);
 } 
 
 
@@ -13,6 +14,7 @@ void main() {
 #version 150
 uniform mat4 mvpMatrix;
 uniform float cellWidth;
+in vec4 vPosition[];
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
 void main() {
@@ -20,20 +22,20 @@ void main() {
   vec4  offset;
   float halfWidth = cellWidth / 2;
 
-  offset = vec4(-halfWidth, -halfWidth, 0.0, 1.0);
-  gl_Position = mvpMatrix * (gl_in[0].gl_Position + offset);
+  offset = vec4(-halfWidth, -halfWidth, 0.0, 0.0);
+  gl_Position = mvpMatrix * (vPosition[0] + offset);
   EmitVertex();
 
-  offset = vec4(halfWidth, -halfWidth, 0.0, 1.0);
-  gl_Position = mvpMatrix * (gl_in[0].gl_Position + offset);
+  offset = vec4(halfWidth, -halfWidth, 0.0, 0.0);
+  gl_Position = mvpMatrix * (vPosition[0] + offset);
   EmitVertex();
 
-  offset = vec4(-halfWidth, halfWidth, 0.0, 1.0);
-  gl_Position = mvpMatrix * (gl_in[0].gl_Position + offset);
+  offset = vec4(-halfWidth, halfWidth, 0.0, 0.0);
+  gl_Position = mvpMatrix * (vPosition[0] + offset);
   EmitVertex();
 
-  offset = vec4(halfWidth, halfWidth, 0.0, 1.0);
-  gl_Position = mvpMatrix * (gl_in[0].gl_Position + offset);
+  offset = vec4(halfWidth, halfWidth, 0.0, 0.0);
+  gl_Position = mvpMatrix * (vPosition[0] + offset);
   EmitVertex();
 }
 
@@ -44,6 +46,5 @@ void main() {
 uniform vec4 color;
 out vec4 fragcolor;
 void main() {
-  // TODO color
-  fragcolor = vec4(1.0, 0.0, 0.0, 1.0);
+  fragcolor = color;
 }
