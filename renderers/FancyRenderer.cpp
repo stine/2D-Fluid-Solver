@@ -1,4 +1,4 @@
-#include "GL/glew.h"
+#include "GL3/gl3.h"
 #include <cstdio>
 #include <vector>
 #include <string>
@@ -41,9 +41,6 @@ FancyRenderer::~FancyRenderer()
 
 void FancyRenderer::initialize()
 {
-  // Initialize the GL Extension Wrangler.
-  glewInit();
-
   // Basic OpenGL setup.
   glEnable(GL_BLEND);
   glBlendEquation(GL_FUNC_ADD);
@@ -54,35 +51,32 @@ void FancyRenderer::initialize()
 
   // Load all shader programs and bind attribute locations.
   _gridProgram.compile("Grid.Vertex", NULL, "Grid.Fragment");
-  _gridProgram.link();
   glBindAttribLocation(_gridProgram, 0, "position");
   glBindFragDataLocation(_gridProgram, 0, "fragcolor");
+  _gridProgram.link();
   glGenVertexArrays(1, &_gridVAO);
   glGenBuffers(1, &_gridVBO);
 
   _cellProgram.compile("Cells.Vertex", "Cells.Geometry", "Cells.Fragment");
-  glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_VERTICES_OUT_EXT, 4);
-  glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
-  glProgramParameteriEXT(_cellProgram, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
-  _cellProgram.link();
   glBindAttribLocation(_cellProgram, 0, "position");
   glBindFragDataLocation(_cellProgram, 0, "fragcolor");
+  _cellProgram.link();
   glGenVertexArrays(1, &_cellVAO);
   glGenBuffers(1, &_cellVBO);
 
   _velocityProgram.compile("Velocity.Vertex", NULL, "Velocity.Fragment");
-  _velocityProgram.link();
   glBindAttribLocation(_velocityProgram, 0, "position");
-  glBindAttribLocation(_velocityProgram, 0, "velocity");
+  glBindAttribLocation(_velocityProgram, 1, "velocity");
   glBindFragDataLocation(_velocityProgram, 0, "fragcolor");
+  _velocityProgram.link();
   glGenVertexArrays(1, &_velocityVAO);
   glGenBuffers(1, &_cellCenterPtsVBO);
   glGenBuffers(1, &_velocityVecsVBO);
 
   _particleProgram.compile("Particles.Vertex", NULL, "Particles.Fragment");
-  _particleProgram.link();
   glBindAttribLocation(_particleProgram, 0, "position");
   glBindFragDataLocation(_particleProgram, 0, "fragcolor");
+  _particleProgram.link();
   glGenVertexArrays(1, &_particlesVAO);
   glGenBuffers(1, &_particlesVBO);
 

@@ -1,4 +1,4 @@
-#include "GL/glew.h"
+#include "GL3/gl3.h"
 #include "QRendererWidget.h"
 #include "CompatibilityRenderer.h"
 #include "FancyRenderer.h"

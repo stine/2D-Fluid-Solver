@@ -1,4 +1,4 @@
-#include "GL/glew.h"
+#include "GL3/gl3.h"
 #include "CompatibilityRenderer.h"
 #include <cstdio>
 

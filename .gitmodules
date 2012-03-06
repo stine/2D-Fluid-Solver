@@ -1,3 +1,6 @@
 [submodule "renderers/glm"]
 	path = renderers/glm
 	url = git://github.com/stine/glm.git
+[submodule "renderers/GL3"]
+	path = renderers/GL3
+	url = git://github.com/stine/GL3.git

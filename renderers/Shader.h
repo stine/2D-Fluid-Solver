@@ -1,7 +1,7 @@
 #ifndef __SHADER_H__
 #define __SHADER_H__
 
-#include "GL/glew.h"
+#include "GL3/gl3.h"
 #include <string>
 #include <vector>
 

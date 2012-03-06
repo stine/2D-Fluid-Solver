@@ -1,7 +1,7 @@
 #ifndef __FANCY_RENDERER_H__
 #define __FANCY_RENDERER_H__
 
-#include "GL/glew.h"
+#include "GL3/gl3.h"
 #include <QGLWidget>
 #include <vector>
 #include <string>

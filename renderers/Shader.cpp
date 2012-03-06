@@ -1,5 +1,5 @@
+#include "GL3/gl3.h"
 #include "Shader.h"
-#include "GL/glew.h"
 #include <cstdio>
 #include <vector>
 #include "glsw.h"
