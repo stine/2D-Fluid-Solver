@@ -16,15 +16,15 @@ Implemented features include:
 - Velocity advection via backward particle trace
 - Particle advection
 - A "compatibility" renderer for visualizing data on older systems
+- An OpenGL 3.2 Core Profile renderer
 
 
 Work to do:
 
-- Good-looking renderer for OpenGL Core profiles
+- Encapsulate advection, pressure solve, and Cell references in the Grid class
 - Boundary condition enforcement
 - Pressure solve (incompressibility requirement)
 - Improved UI with a better layout and more user controls
-- Encapsulate advection, pressure solve, and Cell references in the Grid class
 
 
 ## Compilation
@@ -34,8 +34,6 @@ Work to do:
 Our fluid solver uses Qt 4 and QMake to create GUIs and automatically generate Makefiles.  Both of these are provided by the standard Qt development package.  Linux users can typically find this in their system's package manager (e.g. `sudo yum install qt-devel` on Fedora).  Everyone else can download the Qt 4 SDK at [Qt's download page](http://qt.nokia.com/downloads/).
 
 We also use the Google Test framework in this project.  Again, Linux users can typically find this in their package manager (e.g. `sudo yum install gtest-devel` on Fedora), and everyone else can download it from the [Google Test project page](http://code.google.com/p/googletest/).
-
-Finally, make sure the GL Extension Wrangler library is installed.  Linux users can typically find this in their package manager (e.g. `sudo yum install glew-devel` on Fedora), and everyone else can download it from the [GLEW project page on SourceForge](http://glew.sourceforge.net/).
 
 ### Compiling
 

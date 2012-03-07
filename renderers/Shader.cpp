@@ -91,7 +91,7 @@ GLuint Shader::shaderObj(GLenum shaderType, const char *shaderName) const
   glswInit();
   
   // Load shader program text.
-  glswSetPath("./", ".glsl");
+  glswSetPath("./shaders/", ".glsl");
   const char *shaderText = glswGetShader(shaderName);
   if (!shaderText) {
     fprintf(stderr, "%s\n", glswGetError());

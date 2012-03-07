@@ -1,6 +1,7 @@
 include(../config.pri)
 
 BaseDirectory = ..
+ShaderDir     = $${BaseDirectory}/renderers/shaders
 
 Release:DESTDIR     = $$BaseDirectory/release
 Release:OBJECTS_DIR = $$BaseDirectory/release/.obj
