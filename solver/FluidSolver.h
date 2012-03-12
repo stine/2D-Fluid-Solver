@@ -96,7 +96,7 @@ protected:
   void advanceTimeStep(float timeStepSec);
 
   // Advects the fluid's velocity field via a backward particle trace,
-  // over the specified amount of time.
+  // over the specified amount of time
   //
   // Arguments:
   //   float timeStepSec - The amount of time to advect over.
@@ -105,6 +105,16 @@ protected:
   //   None
   void advectVelocity(float timeStepSec);
   
+  // Computes the backwards particle trace while enforcing boundary conditions
+  //
+  // Arguments:
+  //   Vector2 position - The starting position of an imaginary particle.
+  //   float timeStepSec - The amount of time to trace backwards.
+  //
+  // Returns:
+  //   Vector2 - The new position of the imaginary particle.
+  Vector2 particleTrace(Vector2 position, float timeStepSec);
+
   // Applies a global velocity to all cells containing fluid. This is helpful
   // for simulating gravity.
   //
