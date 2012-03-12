@@ -99,7 +99,7 @@ void FluidSolver::advanceFrame()
 
 void FluidSolver::advanceTimeStep(float timeStepSec)
 {
-  Vector2 gravity(0.0f, -0.098);  // Gravity: -0.098 cells/sec^2
+  Vector2 gravity(0.0f, -0.098f);  // Gravity: -0.098 cells/sec^2
 
   advectVelocity(timeStepSec);
   applyGlobalVelocity(gravity * timeStepSec);
@@ -135,49 +135,79 @@ void FluidSolver::advectVelocity(float timeStepSec)
 Vector2 FluidSolver::particleTrace(Vector2 position, float timeStepSec)
 {
   Vector2 velocity = _grid.getVelocity(position) * -timeStepSec;
+  Vector2 toPosition = position + velocity;
   Vector2 tempPos;
+  float width = _grid.getWidth();
+  float height = _grid.getHeight();
   float dist;
-  bool intersectX = position.x < 0 || position.x > _grid.getWidth();
-  bool intersectY = position.y < 0 || position.y > _grid.getHeight();
+  bool intersectMinX = toPosition.x < 0;
+  bool intersectMaxX = toPosition.x > width;
+  bool intersectMinY = toPosition.y < 0;
+  bool intersectMaxY = toPosition.y > height;
 
-  if (intersectX && intersectY) {
-    dist = position.x / -velocity.x;
+  if (intersectMinX && intersectMinY) {
+    dist = -position.x / velocity.x;
     tempPos.y = position.y + dist * velocity.y;
-    if (position.x < 0)
-      tempPos.zeroX();
-    else
-      tempPos.x = _grid.getWidth();
-    dist = position.y / -velocity.y;
+    tempPos.zeroX();
+    dist = -position.y / velocity.y;
     position.x = position.x + dist * velocity.x;
-    if (position.y < 0)
-      position.zeroY();
-    else
-      position.y = _grid.getHeight();
+    position.zeroY();
     if (tempPos.magnitude() < position.magnitude())
-      return tempPos;
-    else
-      return position; 
+      position = tempPos;
   }
-  else if (intersectX) {
-    dist = position.x / -velocity.x;
-    position.y = position.y + dist * velocity.y;
-    if (position.x < 0)
-      position.zeroX();
-    else
-      position.x = _grid.getWidth();
-    return position;
-  }  
-  else if (intersectY) {
-    dist = position.y / -velocity.y;
+  else if (intersectMaxX && intersectMinY) {
+    dist = (width - position.x) / velocity.x;
+    tempPos.y = position.y + dist * velocity.y;
+    tempPos.x = width;
+    dist = -position.y / velocity.y;
     position.x = position.x + dist * velocity.x;
-    if (position.y < 0)
-      position.zeroY();
-    else
-      position.y = _grid.getHeight();
-    return position;
+    position.zeroY();
+    if (tempPos.magnitude() < position.magnitude())
+      position = tempPos;
   }
-  else 
-    return position + velocity;
+  else if (intersectMinX && intersectMaxY) {
+    dist = -position.x / velocity.x;
+    tempPos.y = position.y + dist * velocity.y;
+    tempPos.zeroX();
+    dist = (height - position.y) / velocity.y;
+    position.x = position.x + dist * velocity.x;
+    position.y = height;
+    if (tempPos.magnitude() < position.magnitude())
+      position = tempPos;
+  }
+  else if (intersectMaxX && intersectMaxY) {
+    dist = (width - position.x) / velocity.x;
+    tempPos.y = position.y + dist * velocity.y;
+    tempPos.x = width;
+    dist = (height - position.y) / velocity.y;
+    position.x = position.x + dist * velocity.x;
+    position.y = height;
+    if (tempPos.magnitude() < position.magnitude())
+      position = tempPos;
+  }
+  else if (intersectMinX) {
+    dist = -position.x / velocity.x;
+    position.y = position.y + dist * velocity.y;
+    position.zeroX();
+  }
+  else if (intersectMaxX) {
+    dist = (width - position.x) / velocity.x;
+    position.y = position.y + dist * velocity.y;
+    position.x = width;
+  }  
+  else if (intersectMinY) {
+    dist = -position.y / velocity.y;
+    position.x = position.x + dist * velocity.x;
+    position.zeroY();
+  }
+  else if (intersectMaxY) {
+    dist = (height - position.y) / velocity.y;
+    position.x = position.x + dist * velocity.x;
+    position.y = height;
+  }
+  else
+    position = toPosition;
+  return position;
 }
 
 void FluidSolver::applyGlobalVelocity(Vector2 velocity)
