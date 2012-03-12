@@ -115,16 +115,16 @@ protected:
   //   None
   void applyGlobalVelocity(Vector2 velocity);
   
-  // Solves the system of linear equations that enforce incompressibility
-  // of the fluid.  This ensures divergence of the velocity field at each
-  // cell is zero.
+  // Adjusts velocity field based on the pressure scalar field to enforce 
+  // incompressibility (non-divergence) of the fluid, and redistributes
+  // pressure values appropriately.
   //
   // Arguments:
-  //   None
+  //   float timeStepSec - The amount of time to simulate.
   // 
   // Returns:
   //   None
-  void pressureSolve();
+  void pressureSolve(float timeStepSec);
   
   // Modifies velocity values to prevent the fluid from flowing out of the
   // simulation boundaries.

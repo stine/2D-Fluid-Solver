@@ -103,8 +103,8 @@ void FluidSolver::advanceTimeStep(float timeStepSec)
 
   advectVelocity(timeStepSec);
   applyGlobalVelocity(gravity * timeStepSec);
+  pressureSolve(timeStepSec);
   boundaryCollide();
-  pressureSolve();
   moveParticles(timeStepSec);
 }
 
@@ -158,9 +158,41 @@ void FluidSolver::applyGlobalVelocity(Vector2 velocity)
 }
 
 
-void FluidSolver::pressureSolve()
+void FluidSolver::pressureSolve(float timeStepSec)
 {
-  // TODO
+  // NOTE: assumptions are made here that the only "SOLID" cells in the sim
+  // are the walls of the simulation, and are therefore not handled in this
+  // method.  Instead, they are handled in the boundaryCollide method where
+  // velocities entering or exiting a boundary are simply set to 0.0f.
+
+  // Modify velocity field based on pressure scalar field.
+  for (unsigned x = 0; x < _grid.getColCount(); ++x)
+    for (unsigned y = 0; y < _grid.getRowCount(); ++y) {
+      Cell &cell = _grid(x,y);
+      float pressureVel = timeStepSec * cell.pressure;
+      if (cell.cellType == Cell::FLUID) {
+	// Update all neighboring velocities touched by this pressure.
+	cell.vel[Cell::X] -= pressureVel;
+	cell.vel[Cell::Y] -= pressureVel;
+	if (cell.neighbors[Cell::POS_X])
+	  cell.neighbors[Cell::POS_X]->vel[Cell::X] += pressureVel;
+	if (cell.neighbors[Cell::POS_Y])
+	  cell.neighbors[Cell::POS_Y]->vel[Cell::Y] += pressureVel;
+      }
+    }
+  
+  // Calculate divergence throughout the simulation.
+  // TODO hackish.
+  vector<float> divergence(_grid.getColCount() * _grid.getRowCount(), 0.0f);
+  for (unsigned x = 0; x < _grid.getColCount(); ++x)
+    for (unsigned y = 0; y < _grid.getRowCount(); ++y) {
+      unsigned index = y * _grid.getColCount() + x;
+      divergence[index] = - _grid.getVelocityDivergence(x, y);
+    }
+
+  // Solve for new pressure values.
+  // TODO.
+
 }
 
 
