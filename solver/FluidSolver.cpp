@@ -140,70 +140,22 @@ Vector2 FluidSolver::particleTrace(Vector2 position, float timeStepSec)
   float width = _grid.getWidth();
   float height = _grid.getHeight();
   float dist;
-  bool intersectMinX = toPosition.x < 0;
-  bool intersectMaxX = toPosition.x > width;
-  bool intersectMinY = toPosition.y < 0;
-  bool intersectMaxY = toPosition.y > height;
+  float interceptX, interceptY = 0; 
+  bool intersectX = toPosition.x < 0 || toPosition.x > _grid.getWidth(); 
+  bool intersectY = toPosition.y < 0 || toPosition.y > _grid.getHeight(); 
 
-  if (intersectMinX && intersectMinY) {
-    dist = -position.x / velocity.x;
+  if (intersectX || intersectY) {
+    if (velocity.x > 0)
+      interceptX = width;
+    if (velocity.y > 0)
+      interceptY = height;
+    dist = interceptX - position.x / velocity.x;
     tempPos.y = position.y + dist * velocity.y;
-    tempPos.zeroX();
-    dist = -position.y / velocity.y;
-    position.x = position.x + dist * velocity.x;
-    position.zeroY();
+    tempPos.x = interceptX;
+    dist = interceptY - position.y / velocity.y;
+    position.x += dist * velocity.y;
     if (tempPos.magnitude() < position.magnitude())
-      position = tempPos;
-  }
-  else if (intersectMaxX && intersectMinY) {
-    dist = (width - position.x) / velocity.x;
-    tempPos.y = position.y + dist * velocity.y;
-    tempPos.x = width;
-    dist = -position.y / velocity.y;
-    position.x = position.x + dist * velocity.x;
-    position.zeroY();
-    if (tempPos.magnitude() < position.magnitude())
-      position = tempPos;
-  }
-  else if (intersectMinX && intersectMaxY) {
-    dist = -position.x / velocity.x;
-    tempPos.y = position.y + dist * velocity.y;
-    tempPos.zeroX();
-    dist = (height - position.y) / velocity.y;
-    position.x = position.x + dist * velocity.x;
-    position.y = height;
-    if (tempPos.magnitude() < position.magnitude())
-      position = tempPos;
-  }
-  else if (intersectMaxX && intersectMaxY) {
-    dist = (width - position.x) / velocity.x;
-    tempPos.y = position.y + dist * velocity.y;
-    tempPos.x = width;
-    dist = (height - position.y) / velocity.y;
-    position.x = position.x + dist * velocity.x;
-    position.y = height;
-    if (tempPos.magnitude() < position.magnitude())
-      position = tempPos;
-  }
-  else if (intersectMinX) {
-    dist = -position.x / velocity.x;
-    position.y = position.y + dist * velocity.y;
-    position.zeroX();
-  }
-  else if (intersectMaxX) {
-    dist = (width - position.x) / velocity.x;
-    position.y = position.y + dist * velocity.y;
-    position.x = width;
-  }  
-  else if (intersectMinY) {
-    dist = -position.y / velocity.y;
-    position.x = position.x + dist * velocity.x;
-    position.zeroY();
-  }
-  else if (intersectMaxY) {
-    dist = (height - position.y) / velocity.y;
-    position.x = position.x + dist * velocity.x;
-    position.y = height;
+      tempPos = position;
   }
   else
     position = toPosition;
