@@ -58,22 +58,16 @@ void FluidSolver::reset()
   //  divergent within a cell.
   // Note: sin() is used to clamp output values to [-1, 1].
   Grid grid(_width, _height);
-  for (float y = 0; y < _height; ++y) 
-    for (float x = 0; x < _width; ++x) {
+  for (unsigned y = _height / 2; y < _height; ++y) 
+    for (unsigned x = _width / 2; x < _width; ++x) {
       grid(x,y).cellType = Cell::FLUID;
-      grid(x,y).pressure = 999.0f;
-      //      grid(x,y).vel[Cell::X] = sin(x * 45.215 + y * 88.15468 + 0.296) / 2; // arbitrary constants
-      //      grid(x,y).vel[Cell::Y] = sin(x * 2.548 + y * 121.1215) / 2;  // arbitrary constants
+      grid(x,y).pressure = 0.0f;
 
-      // Initialize particle positions
+      // Initialize marker particle positions.
       for (unsigned i = 0; i < 4; i++)
         for(unsigned j = 0; j < 4; j++) 
 	  _particles.push_back(Vector2(x + 0.20f * (i + 1), y + 0.20f * (j + 1)));
   }
-  grid(1,0).vel[Cell::X] = 1.0f;
-  grid(1,1).vel[Cell::Y] = 1.0f;
-  grid(1,1).vel[Cell::X] = -1.0f;
-  grid(0,1).vel[Cell::Y] = -1.0f;
 
   // Set values accordingly.
   _grid = grid;
@@ -115,11 +109,12 @@ void FluidSolver::advanceTimeStep(float timeStepSec)
   Vector2 gravity(0.0f, -0.098);  // Gravity: -0.098 cells/sec^2
 
   advectVelocity(timeStepSec);
-  //TODO  applyGlobalVelocity(gravity * timeStepSec);
+  applyGlobalVelocity(gravity * timeStepSec);
   boundaryCollide();
-  pressureSolve(timeStepSec);
-  boundaryCollide();
+  //  pressureSolve(timeStepSec);
+  //  boundaryCollide();
   moveParticles(timeStepSec);
+  markCells();
 }
 
 
@@ -164,11 +159,14 @@ void FluidSolver::advectVelocity(float timeStepSec)
 void FluidSolver::applyGlobalVelocity(Vector2 velocity)
 {
   // Apply the provided velocity to all cells in the simulation.
-  unsigned cellCount = _grid.getRowCount() * _grid.getColCount();
-  for (unsigned i = 0; i < cellCount; ++i) {
-    _grid[i].vel[Cell::X] += velocity.x;
-    _grid[i].vel[Cell::Y] += velocity.y;
-  }
+  for (unsigned y = 0; y < _grid.getHeight(); ++y) 
+    for (unsigned x = 0; x < _grid.getWidth(); ++x) {
+      Cell &cell = _grid(x,y);
+      if (cell.cellType == Cell::FLUID) {
+	cell.vel[Cell::X] += velocity.x;
+	cell.vel[Cell::Y] += velocity.y;
+      }
+    }
 }
 
 
@@ -235,17 +233,17 @@ void FluidSolver::pressureSolve(float timeStepSec)
       unsigned index = y * width + x;
       mean += b(index);
     }
-  std::cout.precision(15);
-  std::cout << "Overall Divergence: " << mean << std::endl;
+  //  std::cout.precision(15);
+  //  std::cout << "Overall Divergence: " << mean << std::endl;
   mean /= dim;
-  std::cout << "PerEntry Divergence: " << mean << std::endl;
-  std::cout << "Pre-compat Divergence: " << std::endl << b << std::endl;
+  //  std::cout << "PerEntry Divergence: " << mean << std::endl;
+  //  std::cout << "Pre-compat Divergence: " << std::endl << b << std::endl;
   for (unsigned y = 0; y < height; ++y)
     for (unsigned x = 0; x < width; ++x) {
       unsigned index = y * width + x;
       b(index) -= mean;
     }
-  std::cout << "Post-compat Divergence: " << std::endl << b << std::endl;
+  //  std::cout << "Post-compat Divergence: " << std::endl << b << std::endl;
 
   // Set the entries of A.
   // TODO this is very hackish!  Shouldn't make assumptions about solid
@@ -306,11 +304,11 @@ void FluidSolver::pressureSolve(float timeStepSec)
     std::cout << "SUCCESS: Convergence!" << std::endl;
   else
     std::cout << "FAILED: No Convergence..." << std::endl;
-  std::cout << "#iterations:     " << cg.iterations() << std::endl;
-  std::cout << "estimated error: " << cg.error()      << std::endl;  
-  std::cout << "A: " << std::endl << A << std::endl;
-  std::cout << "Pressure: " << std::endl << p << std::endl;
-  std::cout << "Ap: " << std::endl << A*p << std::endl;
+  //  std::cout << "#iterations:     " << cg.iterations() << std::endl;
+  //  std::cout << "estimated error: " << cg.error()      << std::endl;  
+  //  std::cout << "A: " << std::endl << A << std::endl;
+  //  std::cout << "Pressure: " << std::endl << p << std::endl;
+  //  std::cout << "Ap: " << std::endl << A*p << std::endl;
 
   // Set new pressure values.
   for (unsigned y = 0; y < height; ++y)
@@ -342,8 +340,8 @@ void FluidSolver::pressureSolve(float timeStepSec)
       unsigned index = y * width + x;
       b(index) = -_grid.getVelocityDivergence(x, y);
     }
-  std::cout << "New Divergence: " << std::endl << b << std::endl;
-  sleep(1);
+  //  std::cout << "New Divergence: " << std::endl << b << std::endl;
+  //  sleep(1);
 }
 
 
@@ -377,11 +375,26 @@ void FluidSolver::boundaryCollide()
 
 void FluidSolver::moveParticles(float timeStepSec)
 {
-  for (vector<Vector2>::iterator itr = _particles.begin();
-                                 itr != _particles.end();
-                                 ++itr)
-  {
+  // Advect velocity using simple forward Euler.
+  vector<Vector2>::iterator itr = _particles.begin();
+  for (; itr != _particles.end(); ++itr) {
     *itr += _grid.getVelocity(*itr) * timeStepSec;
+  }
+}
+
+
+void FluidSolver::markCells()
+{
+  // Sweep over all FLUID cells, resetting them to AIR.
+  unsigned cellCount = _grid.getRowCount() * _grid.getColCount();
+  for (unsigned i = 0; i < cellCount; ++i)
+    if (_grid[i].cellType == Cell::FLUID)
+      _grid[i].cellType = Cell::AIR;
+  
+  // Iterate over all marker particles, setting their resident cells to FLUID.
+  vector<Vector2>::iterator itr = _particles.begin();
+  for (; itr != _particles.end(); ++itr) {
+    _grid(itr->x, itr->y).cellType = Cell::FLUID;
   }
 }
 

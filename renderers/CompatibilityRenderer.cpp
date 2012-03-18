@@ -112,21 +112,24 @@ void CompatibilityRenderer::drawGrid(const Grid &grid,
   glEnd();
 
   // Color the cells gray if they currently contain liquid.
-  glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
   glPushAttrib(GL_DEPTH_BUFFER_BIT);
   glDepthMask(GL_FALSE);
   for (unsigned y = 0; y < height; ++y) {
     for (unsigned x = 0; x < width; ++x) {
-      if (grid(x, y).cellType == Cell::FLUID) {
-	glBegin(GL_TRIANGLES);
-	glVertex2f(x, y);
-	glVertex2f(x+1, y);
-	glVertex2f(x+1, y+1);
-	glVertex2f(x+1, y+1);
-	glVertex2f(x, y+1);
-	glVertex2f(x, y);
-	glEnd();
-      }
+      if (grid(x, y).cellType == Cell::SOLID)
+	continue;
+      if (grid(x, y).cellType == Cell::FLUID)
+	glColor4f(0.65f, 0.65f, 1.0f, 0.1f);
+      if (grid(x, y).cellType == Cell::AIR)
+	glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
+      glBegin(GL_TRIANGLES);
+      glVertex2f(x, y);
+      glVertex2f(x+1, y);
+      glVertex2f(x+1, y+1);
+      glVertex2f(x+1, y+1);
+      glVertex2f(x, y+1);
+      glVertex2f(x, y);
+      glEnd();
     }
   }
   glPopAttrib();

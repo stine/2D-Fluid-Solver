@@ -148,6 +148,15 @@ protected:
   //   None
   void moveParticles(float timeStepSec);
 
+  // Updates all FLUID and AIR cells to reflect positions of marker particles.
+  //
+  // Arguments:
+  //   None
+  // 
+  // Returns:
+  //   None
+  void markCells();
+
 private:
   // Hidden default constructor.
   FluidSolver();
