@@ -10,7 +10,7 @@ class Grid {
   unsigned _rowCount;  // The number of rows in the sim.
   unsigned _colCount;  // The number of columns in the sim.
   std::vector<Cell> _cells;  // STL Vector of all managed cells.
-  const static unsigned _minSize = 3; // Minimum size of grid in any dim.
+  const static unsigned _minSize = 2; // Minimum size of grid in any dim.
 
 public:
   // Constructs an instance of Grid of size width by height. Width and height
