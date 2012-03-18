@@ -14,11 +14,13 @@
 
 using std::vector;
 using Eigen::VectorXd;
+using Eigen::VectorXi;
 using Eigen::SparseMatrix;
+using Eigen::Triplet;
 using Eigen::RowMajor;
 using Eigen::ConjugateGradient;
-using Eigen::Upper;
 using Eigen::Success;
+typedef Triplet<double> Tripletd;
 
 FluidSolver::FluidSolver(float width, float height)
   : _width(width),
@@ -106,13 +108,13 @@ void FluidSolver::advanceFrame()
 
 void FluidSolver::advanceTimeStep(float timeStepSec)
 {
-  Vector2 gravity(0.0f, -0.098);  // Gravity: -0.098 cells/sec^2
+  Vector2 gravity(0.0f, -9.8);  // Gravity: -0.098 cells/sec^2
 
   advectVelocity(timeStepSec);
   applyGlobalVelocity(gravity * timeStepSec);
   boundaryCollide();
-  //  pressureSolve(timeStepSec);
-  //  boundaryCollide();
+  pressureSolve(timeStepSec);
+  boundaryCollide();
   moveParticles(timeStepSec);
   markCells();
 }
@@ -189,7 +191,6 @@ void FluidSolver::pressureSolve(float timeStepSec)
   int dim = width * height;
 
   // Calculate the negative divergence throughout the simulation.
-  // TODO hackish.
   VectorXd b(dim);
   for (unsigned y = 0; y < height; ++y)
     for (unsigned x = 0; x < width; ++x) {
@@ -198,8 +199,7 @@ void FluidSolver::pressureSolve(float timeStepSec)
     }
 
   // Update the negative divergence to account for solid boundaries.
-  // TODO this assumes that the boundaries are the only solids,
-  //   and that the boundaries have zero velocity.
+  // TODO assumes that the only solids are at the boundaries, which have 0 vel.
   // Bottom row.
   for (unsigned x = 0; x < width; ++x) {
     unsigned y = 0;
@@ -227,6 +227,7 @@ void FluidSolver::pressureSolve(float timeStepSec)
 
   // Enforce the compatibility condition.
   // TODO don't need this if we have a free surface.
+  /*
   double mean = 0.0;
   for (unsigned y = 0; y < height; ++y)
     for (unsigned x = 0; x < width; ++x) {
@@ -244,70 +245,76 @@ void FluidSolver::pressureSolve(float timeStepSec)
       b(index) -= mean;
     }
   //  std::cout << "Post-compat Divergence: " << std::endl << b << std::endl;
+  */
 
-  // Set the entries of A.
-  // TODO this is very hackish!  Shouldn't make assumptions about solid
-  //   boundaries bordering cells at max/min grid height/width.
-  // TODO does not take into account 'air' cells, since there currently
-  //   are none. This assumes the entire simulation is liquid!
-  SparseMatrix<double> A(dim, dim);
+  // Set the entries of A. 
+  std::vector< Tripletd > vals;
+  SparseMatrix<double,RowMajor> A(dim, dim);
   for (unsigned y = 0; y < height; ++y)
     for (unsigned x = 0; x < width; ++x) {
-      unsigned coeff = 4;
-      unsigned row = y * width + x;
-      unsigned col;
-      { // left neighbor
-	if (x == 0) 
-	  --coeff;
-	else {
-	  col = y * width + x - 1;
-	  A.insert(row, col) = timeStepSec;
+      Cell &cell = _grid(x,y);
+      unsigned i = y * width + x;  // this cell's col/row in A.
+      unsigned j;                  // neighbor cell's col/row in A
+
+      switch (cell.cellType) {
+      case (Cell::SOLID):
+	// If this cell is a SOLID, leave the entire row as 0's.
+	break;
+
+      case (Cell::AIR):
+	// If this cell is AIR, increment neighboring fluid diagonals' coeff.
+	if (cell.neighbors[Cell::POS_X]->cellType == Cell::FLUID) {
+	  j = y * width + x + 1;                        // rt neighbor's idx
+	  vals.push_back( Tripletd(j,j,timeStepSec) );  // rt neighbor's diag
 	}
-      }
-      { // right neighbor
-	if (x == width - 1)
-	  --coeff;
-	else {
-	  col = y * width + x + 1;
-	  A.insert(row, col) = timeStepSec;
+	if (cell.neighbors[Cell::POS_Y]->cellType == Cell::FLUID) {
+	  j = (y + 1) * width + x;                      // up neighbor's idx
+	  vals.push_back( Tripletd(j,j,timeStepSec) );  // up neighbor's diag
 	}
-      }
-      { // bottom neighbor
-	if (y == 0) 
-	  --coeff;
-	else {
-	  col = (y - 1) * width + x;
-	  A.insert(row, col) = timeStepSec;
+	break;
+
+      case (Cell::FLUID):
+	// Cell is fluid. Determine coefficients of self and neighbors.
+	if (cell.neighbors[Cell::POS_X]->cellType == Cell::FLUID) {
+	  j = y * width + x + 1;                        // rt neighbor's idx
+	  vals.push_back( Tripletd(i,i,timeStepSec) );  // my diagonal coeff
+	  vals.push_back( Tripletd(i,j,-timeStepSec) ); // rt neighbor's coeff
+	  vals.push_back( Tripletd(j,j,timeStepSec) );  // rt neighbor's diag
 	}
-      }
-      { // top neighbor
-	if (y == height - 1) 
-	  --coeff;
-	else {
-	  col = (y + 1) * width + x;
-	  A.insert(row, col) = timeStepSec;
+	else if (cell.neighbors[Cell::POS_X]->cellType == Cell::AIR) {
+	  vals.push_back( Tripletd(i,i,timeStepSec) );
 	}
-      }
-      { // self
-	col = row;
-	A.insert(row, col) = coeff * timeStepSec;
+	if (cell.neighbors[Cell::POS_Y]->cellType == Cell::FLUID) {
+	  j = (y + 1) * width + x;                      // up neighbor's idx
+	  vals.push_back( Tripletd(i,i,timeStepSec) );  // my diagonal coeff
+	  vals.push_back( Tripletd(i,j,-timeStepSec) ); // up neighbor's coeff
+	  vals.push_back( Tripletd(j,j,timeStepSec) );  // up neighbor's diag
+	}
+	else if (cell.neighbors[Cell::POS_Y]->cellType == Cell::AIR) {
+	  vals.push_back( Tripletd(i,i,timeStepSec) );
+	}
+	break;
+	
+      default:
+	break;
       }
     }
-  A.finalize();
+  A.setFromTriplets(vals.begin(), vals.end());
 
   // Solve for the new pressure values, p.
   VectorXd p(dim);
-  ConjugateGradient< SparseMatrix<double> > cg;
+  ConjugateGradient< SparseMatrix<double,RowMajor> > cg;
   cg.compute(A);
   p = cg.solve(b);
   if (cg.info() == Success)
     std::cout << "SUCCESS: Convergence!" << std::endl;
-  else
+  else 
     std::cout << "FAILED: No Convergence..." << std::endl;
   //  std::cout << "#iterations:     " << cg.iterations() << std::endl;
   //  std::cout << "estimated error: " << cg.error()      << std::endl;  
   //  std::cout << "A: " << std::endl << A << std::endl;
   //  std::cout << "Pressure: " << std::endl << p << std::endl;
+  //  std::cout << "Divergence: " << std::endl << b << std::endl;
   //  std::cout << "Ap: " << std::endl << A*p << std::endl;
 
   // Set new pressure values.
@@ -334,14 +341,12 @@ void FluidSolver::pressureSolve(float timeStepSec)
     }
 
   // Calculate the negative divergence throughout the simulation.
-  // TODO hackish.
   for (unsigned y = 0; y < height; ++y)
     for (unsigned x = 0; x < width; ++x) {
       unsigned index = y * width + x;
       b(index) = -_grid.getVelocityDivergence(x, y);
     }
-  //  std::cout << "New Divergence: " << std::endl << b << std::endl;
-  //  sleep(1);
+  std::cout << "New Divergence: " << std::endl << b << std::endl;
 }
 
 
@@ -394,7 +399,9 @@ void FluidSolver::markCells()
   // Iterate over all marker particles, setting their resident cells to FLUID.
   vector<Vector2>::iterator itr = _particles.begin();
   for (; itr != _particles.end(); ++itr) {
-    _grid(itr->x, itr->y).cellType = Cell::FLUID;
+    if (itr->x >= 0.0f && itr->x < _width &&
+	itr->y >= 0.0f && itr->y < _height)
+      _grid(itr->x, itr->y).cellType = Cell::FLUID;
   }
 }
 
@@ -405,7 +412,6 @@ void FluidSolver::draw(IFluidRenderer *renderer)
   if (_frameReady) {
     renderer->drawGrid(_grid, _particles);
     _frameReady = false;
-    // TODO debugging.
   }
   else {
     // TODO, redraw previous frame.
