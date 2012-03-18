@@ -14,6 +14,8 @@ Debug:MOC_DIR     = $$BaseDirectory/debug/.moc
 Debug:RCC_DIR     = $$BaseDirectory/debug/.rcc
 Debug:UI_DIR      = $$BaseDirectory/debug/.ui
 
+DEFINES += EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
+
 INCLUDEPATH += $$BaseDirectory/ui \
                $$BaseDirectory/solver \
                $$BaseDirectory/renderers \

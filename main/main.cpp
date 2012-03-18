@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
 
   // Instantiate the Fluid Solver using the initial velocity field.
-  solver = new FluidSolver(15.0f, 15.0f);
+  solver = new FluidSolver(4.0f, 4.0f);
   
   // Create and realize UI widgets.
   MainWindow window;

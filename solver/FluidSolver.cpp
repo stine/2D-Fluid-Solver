@@ -1,6 +1,9 @@
 // DEBUG
 #include <iostream>
 #include <vector>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Sparse>
+#include <eigen3/Eigen/IterativeLinearSolvers>
 #include "FluidSolver.h"
 #include "IFluidRenderer.h"
 #include "Grid.h"
@@ -10,6 +13,11 @@
 
 
 using std::vector;
+using Eigen::VectorXd;
+using Eigen::SparseMatrix;
+using Eigen::RowMajor;
+using Eigen::ConjugateGradient;
+using Eigen::Upper;
 
 FluidSolver::FluidSolver(float width, float height)
   : _width(width),
@@ -103,8 +111,8 @@ void FluidSolver::advanceTimeStep(float timeStepSec)
 
   advectVelocity(timeStepSec);
   applyGlobalVelocity(gravity * timeStepSec);
-  pressureSolve(timeStepSec);
   boundaryCollide();
+  pressureSolve(timeStepSec);
   moveParticles(timeStepSec);
 }
 
@@ -165,9 +173,92 @@ void FluidSolver::pressureSolve(float timeStepSec)
   // method.  Instead, they are handled in the boundaryCollide method where
   // velocities entering or exiting a boundary are simply set to 0.0f.
 
-  // Modify velocity field based on pressure scalar field.
-  for (unsigned x = 0; x < _grid.getColCount(); ++x)
-    for (unsigned y = 0; y < _grid.getRowCount(); ++y) {
+  // The pressureSolve routine does the following:
+  // * Calculate the negative divergence b with moditications at solid walls.
+  // * Set the entries of A (stored in Adiag, etc.)
+  // * Solve the Ap = b using the conjugate gradient algorithm.
+  // * Compute the new velocities according to the updated pressure.
+
+  // Calculate the dimensionality of our vectors/matrix.
+  int dim = _grid.getColCount() * _grid.getRowCount();
+
+  // Calculate the negative divergence throughout the simulation.
+  // TODO hackish.
+  VectorXd b(dim);
+  for (unsigned y = 0; y < _grid.getRowCount(); ++y)
+    for (unsigned x = 0; x < _grid.getColCount(); ++x) {
+      unsigned index = y * _grid.getColCount() + x;
+      b(index) = -_grid.getVelocityDivergence(x, y);
+    }
+
+  // Set the entries of A.
+  // TODO this is very hackish!  Shouldn't make assumptions about solid
+  //   boundaries bordering cells at max/min grid height/width.
+  // TODO does not take into account 'air' cells, since there currently
+  //   are none. This assumes the entire simulation is liquid!
+  SparseMatrix<double,RowMajor> A(dim, dim);
+  for (unsigned y = 0; y < _grid.getRowCount(); ++y)
+    for (unsigned x = 0; x < _grid.getColCount(); ++x) {
+      unsigned coeff = 4;
+      unsigned row = y * _grid.getColCount() + x;
+      unsigned col;
+      { // left neighbor
+	if (x == 0) 
+	  --coeff;
+	else {
+	  col = y * _grid.getColCount() + x - 1;
+	  A.insert(row, col) = 1;
+	}
+      }
+      { // right neighbor
+	if (x == _grid.getColCount() - 1)
+	  --coeff;
+	else {
+	  col = y * _grid.getColCount() + x + 1;
+	  A.insert(row, col) = 1;
+	}
+      }
+      { // bottom neighbor
+	if (y == 0) 
+	  --coeff;
+	else {
+	  col = (y - 1) * _grid.getColCount() + x;
+	  A.insert(row, col) = 1;
+	}
+      }
+      { // top neighbor
+	if (y == _grid.getRowCount() - 1) 
+	  --coeff;
+	else {
+	  col = (y + 1) * _grid.getColCount() + x;
+	  A.insert(row, col) = 1;
+	}
+      }
+      { // self
+	col = row;
+	A.insert(row, col) = coeff;
+      }
+    }
+  A.finalize();
+
+  // Solve for the new pressure values, p.
+  VectorXd p(dim);
+  ConjugateGradient< SparseMatrix<double,RowMajor> > cg;
+  cg.compute(A);
+  p = cg.solve(b);
+  std::cout << "#iterations:     " << cg.iterations() << std::endl;
+  std::cout << "estimated error: " << cg.error()      << std::endl;  
+
+  // Set new pressure values.
+  for (unsigned y = 0; y < _grid.getRowCount(); ++y)
+    for (unsigned x = 0; x < _grid.getColCount(); ++x) {
+      unsigned index = y * _grid.getColCount() + x;
+      _grid(x, y).pressure = p(index);
+    }
+
+  // Modify velocity field based on updated pressure scalar field.
+  for (unsigned y = 0; y < _grid.getRowCount(); ++y)
+    for (unsigned x = 0; x < _grid.getColCount(); ++x) {
       Cell &cell = _grid(x,y);
       float pressureVel = timeStepSec * cell.pressure;
       if (cell.cellType == Cell::FLUID) {
@@ -180,19 +271,6 @@ void FluidSolver::pressureSolve(float timeStepSec)
 	  cell.neighbors[Cell::POS_Y]->vel[Cell::Y] += pressureVel;
       }
     }
-  
-  // Calculate divergence throughout the simulation.
-  // TODO hackish.
-  vector<float> divergence(_grid.getColCount() * _grid.getRowCount(), 0.0f);
-  for (unsigned x = 0; x < _grid.getColCount(); ++x)
-    for (unsigned y = 0; y < _grid.getRowCount(); ++y) {
-      unsigned index = y * _grid.getColCount() + x;
-      divergence[index] = - _grid.getVelocityDivergence(x, y);
-    }
-
-  // Solve for new pressure values.
-  // TODO.
-
 }
 
 
