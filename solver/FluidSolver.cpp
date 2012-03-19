@@ -108,7 +108,7 @@ void FluidSolver::advanceFrame()
 
 void FluidSolver::advanceTimeStep(float timeStepSec)
 {
-  Vector2 gravity(0.0f, -9.8);  // Gravity: -0.098 cells/sec^2
+  Vector2 gravity(0.0f, -9.8f);  // Gravity: -0.098 cells/sec^2
 
   advectVelocity(timeStepSec);
   applyGlobalVelocity(gravity * timeStepSec);
@@ -126,30 +126,14 @@ void FluidSolver::advectVelocity(float timeStepSec)
     for( float y = 0.5; y < _grid.getHeight(); y += 1.0f) {
       Cell &cell = _grid(floor(x), floor(y));
       Vector2 position(x, y); 
-      position += _grid.getVelocity(position) * -timeStepSec;
-      if (position.x < 0)
-        position.zeroX();
-      if (position.y > _grid.getWidth())
-        position.x = _grid.getWidth(); 
-      if (position.y < 0)
-        position.zeroY();
-      if (position.y > _grid.getHeight())
-        position.y = _grid.getHeight();
+      position = particleTrace(position, timeStepSec);
       cell.stagedVel[Cell::X] = _grid.getVelocity(position).x;
     }
   for(float y = 0; y < _grid.getHeight(); y += 1.0f)
     for(float x = 0.5; x < _grid.getWidth(); x+= 1.0f) {
       Cell &cell = _grid(floor(x), floor(y));
-      Vector2 position(x, y); 
-      position += _grid.getVelocity(position) * -timeStepSec;
-      if (position.x < 0)
-        position.zeroX();
-      if (position.y > _grid.getWidth())
-        position.x = _grid.getWidth();
-      if (position.y < 0)
-        position.zeroY();
-      if (position.y > _grid.getHeight())
-        position.y = _grid.getHeight();
+      Vector2 position(x, y);
+      position = particleTrace(position, timeStepSec);
       cell.stagedVel[Cell::Y] = _grid.getVelocity(position).y;
     }
   for(unsigned i = 0; i < _grid.getRowCount() * _grid.getColCount(); i++) {
@@ -157,6 +141,38 @@ void FluidSolver::advectVelocity(float timeStepSec)
   }
 }
 
+// This function only enforces boundary condtitions at the grid borders,
+// not on the free surface
+Vector2 FluidSolver::particleTrace(Vector2 position, float timeStepSec)
+{
+  Vector2 velocity = _grid.getVelocity(position) * -timeStepSec;
+  Vector2 toPosition = position + velocity;
+  Vector2 tempPos;
+  float width = _grid.getWidth();
+  float height = _grid.getHeight();
+  float dist;
+  float interceptX = 0.0f;
+  float interceptY = 0.0f; 
+  bool intersectX = toPosition.x < 0 || toPosition.x > _grid.getWidth(); 
+  bool intersectY = toPosition.y < 0 || toPosition.y > _grid.getHeight(); 
+
+  if (intersectX || intersectY) {
+    if (velocity.x > 0)
+      interceptX = width;
+    if (velocity.y > 0)
+      interceptY = height;
+    dist = interceptX - position.x / velocity.x;
+    tempPos.y = position.y + dist * velocity.y;
+    tempPos.x = interceptX;
+    dist = interceptY - position.y / velocity.y;
+    position.x += dist * velocity.y;
+    if (tempPos.magnitude() < position.magnitude())
+      tempPos = position;
+  }
+  else
+    position = toPosition;
+  return position;
+}
 
 void FluidSolver::applyGlobalVelocity(Vector2 velocity)
 {
